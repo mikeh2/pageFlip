@@ -11,16 +11,13 @@
     "dist"
   ],
   "exports": {
-    ".": [
-      {
-        "import": "./dist/index.js",
-        "types": "./dist/index.d.ts"
-      },
-      "./dist/index.cjs"
-    ],
-    "./Render/*": {
-      "import": "./dist/Render/*.js",
-      "types": "./dist/Render/*.d.ts"
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./Render/Render": {
+      "import": "./dist/Render/Render.js",
+      "types": "./dist/Render/Render.d.ts"
     },
     "./Settings": {
       "import": "./dist/Settings.js",

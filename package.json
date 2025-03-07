@@ -1,0 +1,16 @@
+{
+  "name": "@mikeh/pageflip",
+  "version": "1.0.0",
+  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc & cp -r src/pf/Style dist/"
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}

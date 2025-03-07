@@ -1,5 +1,6 @@
 import { ImagePage } from '../Page/ImagePage';
 import { PageCollection } from './PageCollection';
+import { PageDensity } from '../Page/Page';
 /**
  * Сlass representing a collection of pages as images on the canvas
  */
@@ -11,7 +12,7 @@ export class ImagePageCollection extends PageCollection {
     }
     load() {
         for (const href of this.imagesHref) {
-            const page = new ImagePage(this.render, href, "soft" /* PageDensity.SOFT */);
+            const page = new ImagePage(this.render, href, PageDensity.SOFT);
             page.load();
             this.pages.push(page);
         }

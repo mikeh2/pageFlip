@@ -1,3 +1,15 @@
+export var PageOrientation;
+(function (PageOrientation) {
+    /** Left side page */
+    PageOrientation[PageOrientation["LEFT"] = 0] = "LEFT";
+    /** Right side page */
+    PageOrientation[PageOrientation["RIGHT"] = 1] = "RIGHT";
+})(PageOrientation || (PageOrientation = {}));
+export var PageDensity;
+(function (PageDensity) {
+    PageDensity["SOFT"] = "soft";
+    PageDensity["HARD"] = "hard";
+})(PageDensity || (PageDensity = {}));
 /**
  * Class representing a book page
  */
@@ -7,7 +19,7 @@ export class Page {
     /** Render object */
     render;
     /** Page Orientation */
-    orientation = 1 /* PageOrientation.RIGHT */;
+    orientation = PageOrientation.RIGHT;
     /** Density at creation */
     createdDensity;
     /** Density at the time of rendering (Depends on neighboring pages) */

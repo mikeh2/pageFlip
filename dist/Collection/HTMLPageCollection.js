@@ -1,5 +1,6 @@
 import { HTMLPage } from '../Page/HTMLPage';
 import { PageCollection } from './PageCollection';
+import { PageDensity } from '../Page/Page';
 /**
  * Сlass representing a collection of pages as HTML Element
  */
@@ -13,7 +14,7 @@ export class HTMLPageCollection extends PageCollection {
     }
     load() {
         for (const pageElement of this.pagesElement) {
-            const page = new HTMLPage(this.render, pageElement, pageElement.dataset['density'] === 'hard' ? "hard" /* PageDensity.HARD */ : "soft" /* PageDensity.SOFT */);
+            const page = new HTMLPage(this.render, pageElement, pageElement.dataset['density'] === 'hard' ? PageDensity.HARD : PageDensity.SOFT);
             page.load();
             this.pages.push(page);
         }

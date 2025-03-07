@@ -5,21 +5,21 @@ import { FlipCalculation } from './FlipCalculation';
 /**
  * Flipping direction
  */
-export declare const enum FlipDirection {
+export declare enum FlipDirection {
     FORWARD = 0,
     BACK = 1
 }
 /**
  * Active corner when flipping
  */
-export declare const enum FlipCorner {
+export declare enum FlipCorner {
     TOP = "top",
     BOTTOM = "bottom"
 }
 /**
  * State of the book
  */
-export declare const enum FlippingState {
+export declare enum FlippingState {
     /** The user folding the page */
     USER_FOLD = "user_fold",
     /** Mouse over active corners */

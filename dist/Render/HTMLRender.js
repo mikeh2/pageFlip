@@ -1,4 +1,6 @@
-import { Render } from './Render';
+import { Orientation, Render } from './Render';
+import { FlipDirection } from '../Flip/Flip';
+import { PageDensity, PageOrientation } from '../Page/Page';
 import { Helper } from '../Helper';
 /**
  * Class responsible for rendering the HTML book
@@ -68,8 +70,8 @@ export class HTMLRender extends Render {
             transform-origin: 0 0;
         `;
         newStyle +=
-            (this.getDirection() === 0 /* FlipDirection.FORWARD */ && this.shadow.progress > 100) ||
-                (this.getDirection() === 1 /* FlipDirection.BACK */ && this.shadow.progress <= 100)
+            (this.getDirection() === FlipDirection.FORWARD && this.shadow.progress > 100) ||
+                (this.getDirection() === FlipDirection.BACK && this.shadow.progress <= 100)
                 ? `transform: translate3d(0, 0, 0);`
                 : `transform: translate3d(0, 0, 0) rotateY(180deg);`;
         this.hardInnerShadow.style.cssText = newStyle;
@@ -93,8 +95,8 @@ export class HTMLRender extends Render {
             transform-origin: 0 0;
         `;
         newStyle +=
-            (this.getDirection() === 0 /* FlipDirection.FORWARD */ && this.shadow.progress > 100) ||
-                (this.getDirection() === 1 /* FlipDirection.BACK */ && this.shadow.progress <= 100)
+            (this.getDirection() === FlipDirection.FORWARD && this.shadow.progress > 100) ||
+                (this.getDirection() === FlipDirection.BACK && this.shadow.progress <= 100)
                 ? `transform: translate3d(0, 0, 0) rotateY(180deg);`
                 : `transform: translate3d(0, 0, 0);`;
         this.hardShadow.style.cssText = newStyle;
@@ -105,8 +107,8 @@ export class HTMLRender extends Render {
     drawInnerShadow() {
         const rect = this.getRect();
         const innerShadowSize = (this.shadow.width * 3) / 4;
-        const shadowTranslate = this.getDirection() === 0 /* FlipDirection.FORWARD */ ? innerShadowSize : 0;
-        const shadowDirection = this.getDirection() === 0 /* FlipDirection.FORWARD */ ? 'to left' : 'to right';
+        const shadowTranslate = this.getDirection() === FlipDirection.FORWARD ? innerShadowSize : 0;
+        const shadowDirection = this.getDirection() === FlipDirection.FORWARD ? 'to left' : 'to right';
         const shadowPos = this.convertToGlobal(this.shadow.pos);
         const angle = this.shadow.angle + (3 * Math.PI) / 2;
         const clip = [
@@ -117,7 +119,7 @@ export class HTMLRender extends Render {
         ];
         let polygon = 'polygon( ';
         for (const p of clip) {
-            let g = this.getDirection() === 1 /* FlipDirection.BACK */
+            let g = this.getDirection() === FlipDirection.BACK
                 ? {
                     x: -p.x + this.shadow.pos.x,
                     y: p.y - this.shadow.pos.y,
@@ -155,8 +157,8 @@ export class HTMLRender extends Render {
         const rect = this.getRect();
         const shadowPos = this.convertToGlobal({ x: this.shadow.pos.x, y: this.shadow.pos.y });
         const angle = this.shadow.angle + (3 * Math.PI) / 2;
-        const shadowTranslate = this.getDirection() === 1 /* FlipDirection.BACK */ ? this.shadow.width : 0;
-        const shadowDirection = this.getDirection() === 0 /* FlipDirection.FORWARD */ ? 'to right' : 'to left';
+        const shadowTranslate = this.getDirection() === FlipDirection.BACK ? this.shadow.width : 0;
+        const shadowDirection = this.getDirection() === FlipDirection.FORWARD ? 'to right' : 'to left';
         const clip = [
             { x: 0, y: 0 },
             { x: rect.pageWidth, y: 0 },
@@ -166,7 +168,7 @@ export class HTMLRender extends Render {
         let polygon = 'polygon( ';
         for (const p of clip) {
             if (p !== null) {
-                let g = this.getDirection() === 1 /* FlipDirection.BACK */
+                let g = this.getDirection() === FlipDirection.BACK
                     ? {
                         x: -p.x + this.shadow.pos.x,
                         y: p.y - this.shadow.pos.y,
@@ -198,17 +200,17 @@ export class HTMLRender extends Render {
      * Draw left static page
      */
     drawLeftPage() {
-        if (this.orientation === "portrait" /* Orientation.PORTRAIT */ || this.leftPage === null)
+        if (this.orientation === Orientation.PORTRAIT || this.leftPage === null)
             return;
-        if (this.direction === 1 /* FlipDirection.BACK */ &&
+        if (this.direction === FlipDirection.BACK &&
             this.flippingPage !== null &&
-            this.flippingPage.getDrawingDensity() === "hard" /* PageDensity.HARD */) {
+            this.flippingPage.getDrawingDensity() === PageDensity.HARD) {
             this.leftPage.getElement().style.zIndex = (this.getSettings().startZIndex + 5).toString(10);
             this.leftPage.setHardDrawingAngle(180 + this.flippingPage.getHardAngle());
             this.leftPage.draw(this.flippingPage.getDrawingDensity());
         }
         else {
-            this.leftPage.simpleDraw(0 /* PageOrientation.LEFT */);
+            this.leftPage.simpleDraw(PageOrientation.LEFT);
         }
     }
     /**
@@ -218,15 +220,15 @@ export class HTMLRender extends Render {
         if (this.rightPage === null)
             return;
         // PORTRAIT is always the right page
-        if (this.direction === 0 /* FlipDirection.FORWARD */ &&
+        if (this.direction === FlipDirection.FORWARD &&
             this.flippingPage !== null &&
-            this.flippingPage.getDrawingDensity() === "hard" /* PageDensity.HARD */) {
+            this.flippingPage.getDrawingDensity() === PageDensity.HARD) {
             this.rightPage.getElement().style.zIndex = (this.getSettings().startZIndex + 5).toString(10);
             this.rightPage.setHardDrawingAngle(180 + this.flippingPage.getHardAngle());
             this.rightPage.draw(this.flippingPage.getDrawingDensity());
         }
         else {
-            this.rightPage.simpleDraw(1 /* PageOrientation.RIGHT */);
+            this.rightPage.simpleDraw(PageOrientation.RIGHT);
         }
     }
     /**
@@ -236,7 +238,7 @@ export class HTMLRender extends Render {
         if (this.bottomPage === null)
             return;
         const tempDensity = this.flippingPage != null ? this.flippingPage.getDrawingDensity() : null;
-        if (!(this.orientation === "portrait" /* Orientation.PORTRAIT */ && this.direction === 1 /* FlipDirection.BACK */)) {
+        if (!(this.orientation === Orientation.PORTRAIT && this.direction === FlipDirection.BACK)) {
             this.bottomPage.getElement().style.zIndex = (this.getSettings().startZIndex + 3).toString(10);
             this.bottomPage.draw(tempDensity);
         }
@@ -251,7 +253,7 @@ export class HTMLRender extends Render {
             this.flippingPage.draw();
         }
         if (this.shadow != null && this.flippingPage !== null) {
-            if (this.flippingPage.getDrawingDensity() === "soft" /* PageDensity.SOFT */) {
+            if (this.flippingPage.getDrawingDensity() === PageDensity.SOFT) {
                 this.drawOuterShadow();
                 this.drawInnerShadow();
             }
@@ -277,10 +279,10 @@ export class HTMLRender extends Render {
     update() {
         super.update();
         if (this.rightPage !== null) {
-            this.rightPage.setOrientation(1 /* PageOrientation.RIGHT */);
+            this.rightPage.setOrientation(PageOrientation.RIGHT);
         }
         if (this.leftPage !== null) {
-            this.leftPage.setOrientation(0 /* PageOrientation.LEFT */);
+            this.leftPage.setOrientation(PageOrientation.LEFT);
         }
     }
 }

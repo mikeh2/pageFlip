@@ -1,6 +1,6 @@
 import { ImagePageCollection } from './Collection/ImagePageCollection';
 import { HTMLPageCollection } from './Collection/HTMLPageCollection';
-import { Flip } from './Flip/Flip';
+import { Flip, FlipCorner } from './Flip/Flip';
 import { CanvasRender } from './Render/CanvasRender';
 import { HTMLUI } from './UI/HTMLUI';
 import { CanvasUI } from './UI/CanvasUI';
@@ -166,7 +166,7 @@ export class PageFlip extends EventObject {
      *
      * @param {FlipCorner} corner - Active page corner when turning
      */
-    flipNext(corner = "top" /* FlipCorner.TOP */) {
+    flipNext(corner = FlipCorner.TOP) {
         this.flipController.flipNext(corner);
     }
     /**
@@ -174,7 +174,7 @@ export class PageFlip extends EventObject {
      *
      * @param {FlipCorner} corner - Active page corner when turning
      */
-    flipPrev(corner = "top" /* FlipCorner.TOP */) {
+    flipPrev(corner = FlipCorner.TOP) {
         this.flipController.flipPrev(corner);
     }
     /**
@@ -183,7 +183,7 @@ export class PageFlip extends EventObject {
      * @param {number} page - New page number
      * @param {FlipCorner} corner - Active page corner when turning
      */
-    flip(page, corner = "top" /* FlipCorner.TOP */) {
+    flip(page, corner = FlipCorner.TOP) {
         this.flipController.flipToPage(page, corner);
     }
     /**

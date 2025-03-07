@@ -1,5 +1,5 @@
 import { Orientation } from './Render/Render';
-export declare const enum ClickFlipType {
+export declare enum ClickFlipType {
     ANYWHERE_ON_PAGE = 1,
     ONLY_ON_CORNERS = 2,
     DISABLE_FLIPPING = 3,

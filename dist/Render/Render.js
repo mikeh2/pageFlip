@@ -1,3 +1,13 @@
+import { FlipDirection } from '../Flip/Flip';
+import { PageOrientation } from '../Page/Page';
+/**
+ * Book orientation
+ */
+export var Orientation;
+(function (Orientation) {
+    Orientation["PORTRAIT"] = "portrait";
+    Orientation["LANDSCAPE"] = "landscape";
+})(Orientation || (Orientation = {}));
 /**
  * Class responsible for rendering the book
  */
@@ -131,7 +141,7 @@ export class Render {
         let pw = w - margin * 2;
         let ph = h - margin * 2;
         let left = -w + margin * 2;
-        if (orientation === "landscape" /* Orientation.LANDSCAPE */) {
+        if (orientation === Orientation.LANDSCAPE) {
             pw = w / 2 - margin * 2;
             left = margin * 2;
             canvas_width = w;
@@ -236,7 +246,7 @@ export class Render {
      */
     setRightPage(page) {
         if (page !== null)
-            page.setOrientation(1 /* PageOrientation.RIGHT */);
+            page.setOrientation(PageOrientation.RIGHT);
         this.rightPage = page;
     }
     /**
@@ -245,7 +255,7 @@ export class Render {
      */
     setLeftPage(page) {
         if (page !== null)
-            page.setOrientation(0 /* PageOrientation.LEFT */);
+            page.setOrientation(PageOrientation.LEFT);
         this.leftPage = page;
     }
     /**
@@ -254,7 +264,7 @@ export class Render {
      */
     setBottomPage(page) {
         if (page !== null)
-            page.setOrientation(this.direction === 1 /* FlipDirection.BACK */ ? 0 /* PageOrientation.LEFT */ : 1 /* PageOrientation.RIGHT */);
+            page.setOrientation(this.direction === FlipDirection.BACK ? PageOrientation.LEFT : PageOrientation.RIGHT);
         this.bottomPage = page;
     }
     /**
@@ -264,10 +274,10 @@ export class Render {
      */
     setFlippingPage(page) {
         if (page !== null)
-            page.setOrientation(this.direction === 0 /* FlipDirection.FORWARD */ &&
-                this.orientation !== "portrait" /* Orientation.PORTRAIT */
-                ? 0 /* PageOrientation.LEFT */
-                : 1 /* PageOrientation.RIGHT */);
+            page.setOrientation(this.direction === FlipDirection.FORWARD &&
+                this.orientation !== Orientation.PORTRAIT
+                ? PageOrientation.LEFT
+                : PageOrientation.RIGHT);
         this.flippingPage = page;
     }
     /**
@@ -298,7 +308,7 @@ export class Render {
         if (!direction)
             direction = this.direction;
         const rect = this.getRect();
-        const x = direction === 0 /* FlipDirection.FORWARD */
+        const x = direction === FlipDirection.FORWARD
             ? pos.x - rect.left - rect.width / 2
             : rect.width / 2 - pos.x + rect.left;
         return {
@@ -320,7 +330,7 @@ export class Render {
         if (pos == null)
             return null;
         const rect = this.getRect();
-        const x = direction === 0 /* FlipDirection.FORWARD */
+        const x = direction === FlipDirection.FORWARD
             ? pos.x + rect.left + rect.width / 2
             : rect.width / 2 - pos.x + rect.left;
         return {

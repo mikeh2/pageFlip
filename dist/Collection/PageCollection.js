@@ -1,3 +1,6 @@
+import { Orientation } from '../Render/Render';
+import { PageDensity } from '../Page/Page';
+import { FlipDirection } from '../Flip/Flip';
 /**
  * Сlass representing a collection of pages
  */
@@ -38,7 +41,7 @@ export class PageCollection {
         }
         let start = 0;
         if (this.isShowCover) {
-            this.pages[0].setDensity("hard" /* PageDensity.HARD */);
+            this.pages[0].setDensity(PageDensity.HARD);
             this.landscapeSpread.push([start]);
             start++;
         }
@@ -47,7 +50,7 @@ export class PageCollection {
                 this.landscapeSpread.push([i, i + 1]);
             else {
                 this.landscapeSpread.push([i]);
-                this.pages[i].setDensity("hard" /* PageDensity.HARD */);
+                this.pages[i].setDensity(PageDensity.HARD);
             }
         }
     }
@@ -55,7 +58,7 @@ export class PageCollection {
      * Get spread by mode (portrait or landscape)
      */
     getSpread() {
-        return this.render.getOrientation() === "landscape" /* Orientation.LANDSCAPE */
+        return this.render.getOrientation() === Orientation.LANDSCAPE
             ? this.landscapeSpread
             : this.portraitSpread;
     }
@@ -123,18 +126,18 @@ export class PageCollection {
      */
     getFlippingPage(direction) {
         const current = this.currentSpreadIndex;
-        if (this.render.getOrientation() === "portrait" /* Orientation.PORTRAIT */) {
-            return direction === 0 /* FlipDirection.FORWARD */
+        if (this.render.getOrientation() === Orientation.PORTRAIT) {
+            return direction === FlipDirection.FORWARD
                 ? this.pages[current].newTemporaryCopy()
                 : this.pages[current - 1];
         }
         else {
-            const spread = direction === 0 /* FlipDirection.FORWARD */
+            const spread = direction === FlipDirection.FORWARD
                 ? this.getSpread()[current + 1]
                 : this.getSpread()[current - 1];
             if (spread.length === 1)
                 return this.pages[spread[0]];
-            return direction === 0 /* FlipDirection.FORWARD */
+            return direction === FlipDirection.FORWARD
                 ? this.pages[spread[0]]
                 : this.pages[spread[1]];
         }
@@ -146,18 +149,18 @@ export class PageCollection {
      */
     getBottomPage(direction) {
         const current = this.currentSpreadIndex;
-        if (this.render.getOrientation() === "portrait" /* Orientation.PORTRAIT */) {
-            return direction === 0 /* FlipDirection.FORWARD */
+        if (this.render.getOrientation() === Orientation.PORTRAIT) {
+            return direction === FlipDirection.FORWARD
                 ? this.pages[current + 1]
                 : this.pages[current - 1];
         }
         else {
-            const spread = direction === 0 /* FlipDirection.FORWARD */
+            const spread = direction === FlipDirection.FORWARD
                 ? this.getSpread()[current + 1]
                 : this.getSpread()[current - 1];
             if (spread.length === 1)
                 return this.pages[spread[0]];
-            return direction === 0 /* FlipDirection.FORWARD */
+            return direction === FlipDirection.FORWARD
                 ? this.pages[spread[1]]
                 : this.pages[spread[0]];
         }
@@ -230,7 +233,7 @@ export class PageCollection {
             this.render.setRightPage(this.pages[spread[1]]);
         }
         else {
-            if (this.render.getOrientation() === "landscape" /* Orientation.LANDSCAPE */) {
+            if (this.render.getOrientation() === Orientation.LANDSCAPE) {
                 if (spread[0] === this.pages.length - 1) {
                     this.render.setLeftPage(this.pages[spread[0]]);
                     this.render.setRightPage(null);

@@ -22,7 +22,7 @@ export interface PageState {
     hardDrawingAngle: number;
 }
 
-export const enum PageOrientation {
+export enum PageOrientation {
     /** Left side page */
     LEFT = 0,
 
@@ -30,7 +30,7 @@ export const enum PageOrientation {
     RIGHT = 1,
 }
 
-export const enum PageDensity {
+export enum PageDensity {
     SOFT = 'soft',
     HARD = 'hard',
 }

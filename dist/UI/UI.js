@@ -1,3 +1,6 @@
+import { FlipCorner, FlippingState } from '../Flip/Flip';
+import { Orientation } from '../Render/Render';
+import { ClickFlipType } from '../Settings';
 /**
  * UI Class, represents work with DOM
  */
@@ -66,10 +69,10 @@ export class UI {
      */
     setOrientationStyle(orientation) {
         this.wrapper.classList.remove('--portrait', '--landscape');
-        if (orientation === "portrait" /* Orientation.PORTRAIT */) {
+        if (orientation === Orientation.PORTRAIT) {
             this.wrapper.classList.add('--portrait');
         }
-        else if (orientation === "landscape" /* Orientation.LANDSCAPE */) {
+        else if (orientation === Orientation.LANDSCAPE) {
             this.wrapper.classList.add('--landscape');
         }
         this.update();
@@ -86,8 +89,8 @@ export class UI {
     setHandlers() {
         window.addEventListener('resize', this.onResize, false);
         const clickFlipType = this.app.getSettings().clickFlipType;
-        if (clickFlipType == 3 /* ClickFlipType.DISABLE_FLIPPING */ ||
-            clickFlipType == 4 /* ClickFlipType.ONLY_VIA_API */) {
+        if (clickFlipType == ClickFlipType.DISABLE_FLIPPING ||
+            clickFlipType == ClickFlipType.ONLY_VIA_API) {
             return;
         }
         // if (!this.app.getSettings().useMouseEvents) return;
@@ -165,12 +168,12 @@ export class UI {
             if (this.app.getSettings().mobileScrollSupport) {
                 if (this.touchPoint !== null) {
                     if (Math.abs(this.touchPoint.point.x - pos.x) > 10 ||
-                        this.app.getState() !== "read" /* FlippingState.READ */) {
+                        this.app.getState() !== FlippingState.READ) {
                         if (e.cancelable)
                             this.app.userMove(pos, true);
                     }
                 }
-                if (this.app.getState() !== "read" /* FlippingState.READ */) {
+                if (this.app.getState() !== FlippingState.READ) {
                     e.preventDefault();
                 }
             }
@@ -193,13 +196,13 @@ export class UI {
                     Date.now() - this.touchPoint.time < this.swipeTimeout) {
                     if (dx > 0) {
                         this.app.flipPrev(this.touchPoint.point.y < this.app.getRender().getRect().height / 2
-                            ? "top" /* FlipCorner.TOP */
-                            : "bottom" /* FlipCorner.BOTTOM */);
+                            ? FlipCorner.TOP
+                            : FlipCorner.BOTTOM);
                     }
                     else {
                         this.app.flipNext(this.touchPoint.point.y < this.app.getRender().getRect().height / 2
-                            ? "top" /* FlipCorner.TOP */
-                            : "bottom" /* FlipCorner.BOTTOM */);
+                            ? FlipCorner.TOP
+                            : FlipCorner.BOTTOM);
                     }
                     isSwipe = true;
                 }

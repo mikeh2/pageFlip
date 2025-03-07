@@ -1,4 +1,4 @@
-import { Page } from './Page';
+import { Page, PageOrientation } from './Page';
 /**
  * Class representing a book page as an image on Canvas
  */
@@ -40,7 +40,7 @@ export class ImagePage extends Page {
         const ctx = this.render.getContext();
         const pageWidth = rect.pageWidth;
         const pageHeight = rect.height;
-        const x = orient === 1 /* PageOrientation.RIGHT */ ? rect.left + rect.pageWidth : rect.left;
+        const x = orient === PageOrientation.RIGHT ? rect.left + rect.pageWidth : rect.left;
         const y = rect.top;
         if (!this.isLoad) {
             this.drawLoader(ctx, { x, y }, pageWidth, pageHeight);

@@ -1,4 +1,5 @@
 import { Helper } from '../Helper';
+import { FlipCorner, FlipDirection } from './Flip';
 /**
  * Class representing mathematical methods for calculating page position (rotation angle, clip area ...)
  */
@@ -68,7 +69,7 @@ export class FlipCalculation {
                 clipBottom = false;
         }
         result.push(this.bottomIntersectPoint);
-        if (clipBottom || this.corner === "bottom" /* FlipCorner.BOTTOM */) {
+        if (clipBottom || this.corner === FlipCorner.BOTTOM) {
             result.push(this.rect.bottomLeft);
         }
         return result;
@@ -81,7 +82,7 @@ export class FlipCalculation {
     getBottomClipArea() {
         const result = [];
         result.push(this.topIntersectPoint);
-        if (this.corner === "top" /* FlipCorner.TOP */) {
+        if (this.corner === FlipCorner.TOP) {
             result.push({ x: this.pageWidth, y: 0 });
         }
         else {
@@ -95,7 +96,7 @@ export class FlipCalculation {
                 result.push(this.sideIntersectPoint);
         }
         else {
-            if (this.corner === "top" /* FlipCorner.TOP */) {
+            if (this.corner === FlipCorner.TOP) {
                 result.push({ x: this.pageWidth, y: this.pageHeight });
             }
         }
@@ -107,7 +108,7 @@ export class FlipCalculation {
      * Get page rotation angle
      */
     getAngle() {
-        if (this.direction === 0 /* FlipDirection.FORWARD */) {
+        if (this.direction === FlipDirection.FORWARD) {
             return -this.angle;
         }
         return this.angle;
@@ -128,7 +129,7 @@ export class FlipCalculation {
      * Get the active corner of the page (which pull)
      */
     getActiveCorner() {
-        if (this.direction === 0 /* FlipDirection.FORWARD */) {
+        if (this.direction === FlipDirection.FORWARD) {
             return this.rect.topLeft;
         }
         return this.rect.topRight;
@@ -155,7 +156,7 @@ export class FlipCalculation {
      * Get start position for the page that is below the page to be flipped
      */
     getBottomPagePosition() {
-        if (this.direction === 1 /* FlipDirection.BACK */) {
+        if (this.direction === FlipDirection.BACK) {
             return { x: this.pageWidth, y: 0 };
         }
         return { x: 0, y: 0 };
@@ -164,7 +165,7 @@ export class FlipCalculation {
      * Get the starting position of the shadow
      */
     getShadowStartPoint() {
-        if (this.corner === "top" /* FlipCorner.TOP */) {
+        if (this.corner === FlipCorner.TOP) {
             return this.topIntersectPoint;
         }
         else {
@@ -181,7 +182,7 @@ export class FlipCalculation {
             { x: 0, y: 0 },
             { x: this.pageWidth, y: 0 },
         ]);
-        if (this.direction === 0 /* FlipDirection.FORWARD */) {
+        if (this.direction === FlipDirection.FORWARD) {
             return angle;
         }
         return Math.PI - angle;
@@ -189,7 +190,7 @@ export class FlipCalculation {
     calcAngleAndPosition(pos) {
         let result = pos;
         this.updateAngleAndGeometry(result);
-        if (this.corner === "top" /* FlipCorner.TOP */) {
+        if (this.corner === FlipCorner.TOP) {
             result = this.checkPositionAtCenterLine(result, { x: 0, y: 0 }, { x: 0, y: this.pageHeight });
         }
         else {
@@ -206,19 +207,19 @@ export class FlipCalculation {
     }
     calculateAngle(pos) {
         const left = this.pageWidth - pos.x + 1;
-        const top = this.corner === "bottom" /* FlipCorner.BOTTOM */ ? this.pageHeight - pos.y : pos.y;
+        const top = this.corner === FlipCorner.BOTTOM ? this.pageHeight - pos.y : pos.y;
         let angle = 2 * Math.acos(left / Math.sqrt(top * top + left * left));
         if (top < 0)
             angle = -angle;
         const da = Math.PI - angle;
         if (!isFinite(angle) || (da >= 0 && da < 0.003))
             throw new Error('The G point is too small');
-        if (this.corner === "bottom" /* FlipCorner.BOTTOM */)
+        if (this.corner === FlipCorner.BOTTOM)
             angle = -angle;
         return angle;
     }
     getPageRect(localPos) {
-        if (this.corner === "top" /* FlipCorner.TOP */) {
+        if (this.corner === FlipCorner.TOP) {
             return this.getRectFromBasePoint([
                 { x: 0, y: 0 },
                 { x: this.pageWidth, y: 0 },
@@ -258,7 +259,7 @@ export class FlipCalculation {
             width: this.pageWidth + 2,
             height: this.pageHeight + 2,
         };
-        if (this.corner === "top" /* FlipCorner.TOP */) {
+        if (this.corner === FlipCorner.TOP) {
             this.topIntersectPoint = Helper.GetIntersectBetweenTwoSegment(boundRect, [pos, this.rect.topRight], [
                 { x: 0, y: 0 },
                 { x: this.pageWidth, y: 0 },
@@ -297,7 +298,7 @@ export class FlipCalculation {
         const rad = Math.sqrt(Math.pow(this.pageWidth, 2) + Math.pow(this.pageHeight, 2));
         let checkPointOne = this.rect.bottomRight;
         let checkPointTwo = this.rect.topLeft;
-        if (this.corner === "bottom" /* FlipCorner.BOTTOM */) {
+        if (this.corner === FlipCorner.BOTTOM) {
             checkPointOne = this.rect.topRight;
             checkPointTwo = this.rect.bottomLeft;
         }

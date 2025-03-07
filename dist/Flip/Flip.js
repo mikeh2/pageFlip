@@ -1,5 +1,38 @@
+import { Orientation } from '../Render/Render';
 import { Helper } from '../Helper';
 import { FlipCalculation } from './FlipCalculation';
+import { PageDensity } from '../Page/Page';
+import { ClickFlipType } from '../Settings';
+/**
+ * Flipping direction
+ */
+export var FlipDirection;
+(function (FlipDirection) {
+    FlipDirection[FlipDirection["FORWARD"] = 0] = "FORWARD";
+    FlipDirection[FlipDirection["BACK"] = 1] = "BACK";
+})(FlipDirection || (FlipDirection = {}));
+/**
+ * Active corner when flipping
+ */
+export var FlipCorner;
+(function (FlipCorner) {
+    FlipCorner["TOP"] = "top";
+    FlipCorner["BOTTOM"] = "bottom";
+})(FlipCorner || (FlipCorner = {}));
+/**
+ * State of the book
+ */
+export var FlippingState;
+(function (FlippingState) {
+    /** The user folding the page */
+    FlippingState["USER_FOLD"] = "user_fold";
+    /** Mouse over active corners */
+    FlippingState["FOLD_CORNER"] = "fold_corner";
+    /** During flipping animation */
+    FlippingState["FLIPPING"] = "flipping";
+    /** Base state */
+    FlippingState["READ"] = "read";
+})(FlippingState || (FlippingState = {}));
 /**
  * Class representing the flipping process
  */
@@ -9,7 +42,7 @@ export class Flip {
     flippingPage = null;
     bottomPage = null;
     calc = null;
-    state = "read" /* FlippingState.READ */;
+    state = FlippingState.READ;
     constructor(render, app) {
         this.render = render;
         this.app = app;
@@ -20,7 +53,7 @@ export class Flip {
      * @param globalPos - Touch Point Coordinates (relative window)
      */
     fold(globalPos) {
-        this.setState("user_fold" /* FlippingState.USER_FOLD */);
+        this.setState(FlippingState.USER_FOLD);
         // If the process has not started yet
         if (this.calc === null)
             this.start(globalPos);
@@ -33,10 +66,10 @@ export class Flip {
      */
     flip(globalPos) {
         let flipType = this.app.getSettings().clickFlipType;
-        if (flipType === 3 /* ClickFlipType.DISABLE_FLIPPING */) {
+        if (flipType === ClickFlipType.DISABLE_FLIPPING) {
             return;
         }
-        if (flipType === 2 /* ClickFlipType.ONLY_ON_CORNERS */) {
+        if (flipType === ClickFlipType.ONLY_ON_CORNERS) {
             const on_corner = this.isPointOnCorners(globalPos);
             if (!on_corner) {
                 return;
@@ -51,12 +84,12 @@ export class Flip {
         if (!this.start(globalPos))
             return;
         const rect = this.getBoundsRect();
-        this.setState("flipping" /* FlippingState.FLIPPING */);
+        this.setState(FlippingState.FLIPPING);
         // Margin from top to start flipping
         const topMargins = rect.height / 10;
         // Defining animation start points
-        const yStart = this.calc.getCorner() === "bottom" /* FlipCorner.BOTTOM */ ? rect.height - topMargins : topMargins;
-        const yDest = this.calc.getCorner() === "bottom" /* FlipCorner.BOTTOM */ ? rect.height : 0;
+        const yStart = this.calc.getCorner() === FlipCorner.BOTTOM ? rect.height - topMargins : topMargins;
+        const yDest = this.calc.getCorner() === FlipCorner.BOTTOM ? rect.height : 0;
         // Сalculations for these points
         this.calc.calc({ x: rect.pageWidth - topMargins, y: yStart });
         // Run flipping animation
@@ -76,20 +109,20 @@ export class Flip {
         // Find the direction of flipping
         const direction = this.getDirectionByPoint(bookPos);
         // Find the active corner
-        const flipCorner = bookPos.y >= rect.height / 2 ? "bottom" /* FlipCorner.BOTTOM */ : "top" /* FlipCorner.TOP */;
+        const flipCorner = bookPos.y >= rect.height / 2 ? FlipCorner.BOTTOM : FlipCorner.TOP;
         if (!this.checkDirection(direction))
             return false;
         try {
             this.flippingPage = this.app.getPageCollection().getFlippingPage(direction);
             this.bottomPage = this.app.getPageCollection().getBottomPage(direction);
             // In landscape mode, needed to set the density  of the next page to the same as that of the flipped
-            if (this.render.getOrientation() === "landscape" /* Orientation.LANDSCAPE */) {
-                if (direction === 1 /* FlipDirection.BACK */) {
+            if (this.render.getOrientation() === Orientation.LANDSCAPE) {
+                if (direction === FlipDirection.BACK) {
                     const nextPage = this.app.getPageCollection().nextBy(this.flippingPage);
                     if (nextPage !== null) {
                         if (this.flippingPage.getDensity() !== nextPage.getDensity()) {
-                            this.flippingPage.setDrawingDensity("hard" /* PageDensity.HARD */);
-                            nextPage.setDrawingDensity("hard" /* PageDensity.HARD */);
+                            this.flippingPage.setDrawingDensity(PageDensity.HARD);
+                            nextPage.setDrawingDensity(PageDensity.HARD);
                         }
                     }
                 }
@@ -97,8 +130,8 @@ export class Flip {
                     const prevPage = this.app.getPageCollection().prevBy(this.flippingPage);
                     if (prevPage !== null) {
                         if (this.flippingPage.getDensity() !== prevPage.getDensity()) {
-                            this.flippingPage.setDrawingDensity("hard" /* PageDensity.HARD */);
-                            prevPage.setDrawingDensity("hard" /* PageDensity.HARD */);
+                            this.flippingPage.setDrawingDensity(PageDensity.HARD);
+                            prevPage.setDrawingDensity(PageDensity.HARD);
                         }
                     }
                 }
@@ -131,7 +164,7 @@ export class Flip {
             this.flippingPage.setArea(this.calc.getFlippingClipArea());
             this.flippingPage.setPosition(this.calc.getActiveCorner());
             this.flippingPage.setAngle(this.calc.getAngle());
-            if (this.calc.getDirection() === 0 /* FlipDirection.FORWARD */) {
+            if (this.calc.getDirection() === FlipDirection.FORWARD) {
                 this.flippingPage.setHardAngle((90 * (200 - progress * 2)) / 100);
             }
             else {
@@ -174,7 +207,7 @@ export class Flip {
     flipNext(corner) {
         this.flip({
             x: this.render.getRect().left + this.render.getRect().pageWidth * 2 - 10,
-            y: corner === "top" /* FlipCorner.TOP */ ? 1 : this.render.getRect().height - 2,
+            y: corner === FlipCorner.TOP ? 1 : this.render.getRect().height - 2,
         });
     }
     /**
@@ -185,7 +218,7 @@ export class Flip {
     flipPrev(corner) {
         this.flip({
             x: 10,
-            y: corner === "top" /* FlipCorner.TOP */ ? 1 : this.render.getRect().height - 2,
+            y: corner === FlipCorner.TOP ? 1 : this.render.getRect().height - 2,
         });
     }
     /**
@@ -196,7 +229,7 @@ export class Flip {
             return;
         const pos = this.calc.getPosition();
         const rect = this.getBoundsRect();
-        const y = this.calc.getCorner() === "bottom" /* FlipCorner.BOTTOM */ ? rect.height : 0;
+        const y = this.calc.getCorner() === FlipCorner.BOTTOM ? rect.height : 0;
         if (pos.x <= 0)
             this.animateFlippingTo(pos, { x: -rect.pageWidth, y }, true);
         else
@@ -209,7 +242,7 @@ export class Flip {
      * @param globalPos
      */
     showCorner(globalPos) {
-        if (!this.checkState("read" /* FlippingState.READ */, "fold_corner" /* FlippingState.FOLD_CORNER */))
+        if (!this.checkState(FlippingState.READ, FlippingState.FOLD_CORNER))
             return;
         const rect = this.getBoundsRect();
         const pageWidth = rect.pageWidth;
@@ -217,11 +250,11 @@ export class Flip {
             if (this.calc === null) {
                 if (!this.start(globalPos))
                     return;
-                this.setState("fold_corner" /* FlippingState.FOLD_CORNER */);
+                this.setState(FlippingState.FOLD_CORNER);
                 this.calc.calc({ x: pageWidth - 1, y: 1 });
                 const fixedCornerSize = 50;
-                const yStart = this.calc.getCorner() === "bottom" /* FlipCorner.BOTTOM */ ? rect.height - 1 : 1;
-                const yDest = this.calc.getCorner() === "bottom" /* FlipCorner.BOTTOM */
+                const yStart = this.calc.getCorner() === FlipCorner.BOTTOM ? rect.height - 1 : 1;
+                const yDest = this.calc.getCorner() === FlipCorner.BOTTOM
                     ? rect.height - fixedCornerSize
                     : fixedCornerSize;
                 this.animateFlippingTo({ x: pageWidth - 1, y: yStart }, { x: pageWidth - fixedCornerSize, y: yDest }, false, false);
@@ -231,7 +264,7 @@ export class Flip {
             }
         }
         else {
-            this.setState("read" /* FlippingState.READ */);
+            this.setState(FlippingState.READ);
             this.render.finishAnimation();
             this.stopMove();
         }
@@ -256,7 +289,7 @@ export class Flip {
             if (!this.calc)
                 return;
             if (isTurned) {
-                if (this.calc.getDirection() === 1 /* FlipDirection.BACK */)
+                if (this.calc.getDirection() === FlipDirection.BACK)
                     this.app.turnToPrevPage();
                 else
                     this.app.turnToNextPage();
@@ -265,7 +298,7 @@ export class Flip {
                 this.render.setBottomPage(null);
                 this.render.setFlippingPage(null);
                 this.render.clearShadow();
-                this.setState("read" /* FlippingState.READ */);
+                this.setState(FlippingState.READ);
                 this.reset();
             }
         });
@@ -290,15 +323,15 @@ export class Flip {
     }
     getDirectionByPoint(touchPos) {
         const rect = this.getBoundsRect();
-        if (this.render.getOrientation() === "portrait" /* Orientation.PORTRAIT */) {
+        if (this.render.getOrientation() === Orientation.PORTRAIT) {
             if (touchPos.x - rect.pageWidth <= rect.width / 5) {
-                return 1 /* FlipDirection.BACK */;
+                return FlipDirection.BACK;
             }
         }
         else if (touchPos.x < rect.width / 2) {
-            return 1 /* FlipDirection.BACK */;
+            return FlipDirection.BACK;
         }
-        return 0 /* FlipDirection.FORWARD */;
+        return FlipDirection.FORWARD;
     }
     getAnimationDuration(size) {
         const defaultTime = this.app.getSettings().flippingTime;
@@ -307,7 +340,7 @@ export class Flip {
         return (size / 1000) * defaultTime;
     }
     checkDirection(direction) {
-        if (direction === 0 /* FlipDirection.FORWARD */)
+        if (direction === FlipDirection.FORWARD)
             return this.app.getCurrentPageIndex() < this.app.getPageCount() - 1;
         return this.app.getCurrentPageIndex() >= 1;
     }

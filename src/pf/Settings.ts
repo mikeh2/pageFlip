@@ -1,7 +1,7 @@
 import { Orientation } from './Render/Render'; 
 
 
-export const enum ClickFlipType {
+export enum ClickFlipType {
     // auto set useMouseEvents = true
     ANYWHERE_ON_PAGE = 1,
     ONLY_ON_CORNERS = 2,

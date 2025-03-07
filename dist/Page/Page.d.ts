@@ -15,13 +15,13 @@ export interface PageState {
     /** Rotate angle for hard pages at renedering time */
     hardDrawingAngle: number;
 }
-export declare const enum PageOrientation {
+export declare enum PageOrientation {
     /** Left side page */
     LEFT = 0,
     /** Right side page */
     RIGHT = 1
 }
-export declare const enum PageDensity {
+export declare enum PageDensity {
     SOFT = "soft",
     HARD = "hard"
 }

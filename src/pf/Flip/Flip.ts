@@ -9,7 +9,7 @@ import {ClickFlipType} from '../Settings';
 /**
  * Flipping direction
  */
-export const enum FlipDirection {
+export enum FlipDirection {
     FORWARD,
     BACK,
 }
@@ -17,7 +17,7 @@ export const enum FlipDirection {
 /**
  * Active corner when flipping
  */
-export const enum FlipCorner {
+export enum FlipCorner {
     TOP = 'top',
     BOTTOM = 'bottom',
 }
@@ -25,7 +25,7 @@ export const enum FlipCorner {
 /**
  * State of the book
  */
-export const enum FlippingState {
+export enum FlippingState {
     /** The user folding the page */
     USER_FOLD = 'user_fold',
 

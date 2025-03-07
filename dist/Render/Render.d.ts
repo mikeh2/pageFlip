@@ -41,7 +41,7 @@ type AnimationProcess = {
 /**
  * Book orientation
  */
-export declare const enum Orientation {
+export declare enum Orientation {
     PORTRAIT = "portrait",
     LANDSCAPE = "landscape"
 }

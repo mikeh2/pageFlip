@@ -1,4 +1,6 @@
-import { Render } from './Render';
+import { Orientation, Render } from './Render';
+import { FlipDirection } from '../Flip/Flip';
+import { PageOrientation } from '../Page/Page';
 /**
  * Class responsible for rendering the Canvas book
  */
@@ -19,11 +21,11 @@ export class CanvasRender extends Render {
     }
     drawFrame() {
         this.clear();
-        if (this.orientation !== "portrait" /* Orientation.PORTRAIT */)
+        if (this.orientation !== Orientation.PORTRAIT)
             if (this.leftPage != null)
-                this.leftPage.simpleDraw(0 /* PageOrientation.LEFT */);
+                this.leftPage.simpleDraw(PageOrientation.LEFT);
         if (this.rightPage != null)
-            this.rightPage.simpleDraw(1 /* PageOrientation.RIGHT */);
+            this.rightPage.simpleDraw(PageOrientation.RIGHT);
         if (this.bottomPage != null)
             this.bottomPage.draw();
         this.drawBookShadow();
@@ -34,7 +36,7 @@ export class CanvasRender extends Render {
             this.drawInnerShadow();
         }
         const rect = this.getRect();
-        if (this.orientation === "portrait" /* Orientation.PORTRAIT */) {
+        if (this.orientation === Orientation.PORTRAIT) {
             this.ctx.beginPath();
             this.ctx.rect(rect.left + rect.pageWidth, rect.top, rect.width, rect.height);
             this.ctx.clip();
@@ -69,7 +71,7 @@ export class CanvasRender extends Render {
         this.ctx.translate(shadowPos.x, shadowPos.y);
         this.ctx.rotate(Math.PI + this.shadow.angle + Math.PI / 2);
         const outerGradient = this.ctx.createLinearGradient(0, 0, this.shadow.width, 0);
-        if (this.shadow.direction === 0 /* FlipDirection.FORWARD */) {
+        if (this.shadow.direction === FlipDirection.FORWARD) {
             this.ctx.translate(0, -100);
             outerGradient.addColorStop(0, 'rgba(0, 0, 0, ' + this.shadow.opacity + ')');
             outerGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
@@ -98,7 +100,7 @@ export class CanvasRender extends Render {
         this.ctx.rotate(Math.PI + this.shadow.angle + Math.PI / 2);
         const isw = (this.shadow.width * 3) / 4;
         const innerGradient = this.ctx.createLinearGradient(0, 0, isw, 0);
-        if (this.shadow.direction === 0 /* FlipDirection.FORWARD */) {
+        if (this.shadow.direction === FlipDirection.FORWARD) {
             this.ctx.translate(-isw, -100);
             innerGradient.addColorStop(1, 'rgba(0, 0, 0, ' + this.shadow.opacity + ')');
             innerGradient.addColorStop(0.9, 'rgba(0, 0, 0, 0.05)');

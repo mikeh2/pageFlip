@@ -1,5 +1,6 @@
-import { Page } from './Page';
+import { Page, PageDensity, PageOrientation } from './Page';
 import { Helper } from '../Helper';
+import { FlipDirection } from '../Flip/Flip';
 /**
  * Class representing a book page as a HTML Element
  */
@@ -15,7 +16,7 @@ export class HTMLPage extends Page {
         this.element.classList.add('__' + density);
     }
     newTemporaryCopy() {
-        if (this.nowDrawingDensity === "hard" /* PageDensity.HARD */) {
+        if (this.nowDrawingDensity === PageDensity.HARD) {
             return this;
         }
         if (this.temporaryCopy === null) {
@@ -49,7 +50,7 @@ export class HTMLPage extends Page {
             width: ${pageWidth}px;
             height: ${pageHeight}px;
         `;
-        density === "hard" /* PageDensity.HARD */
+        density === PageDensity.HARD
             ? this.drawHard(commonStyle)
             : this.drawSoft(pagePos, commonStyle);
     }
@@ -63,7 +64,7 @@ export class HTMLPage extends Page {
                 clip-path: none;
                 -webkit-clip-path: none;
             ` +
-            (this.orientation === 0 /* PageOrientation.LEFT */
+            (this.orientation === PageOrientation.LEFT
                 ? `transform-origin: ${this.render.getRect().pageWidth}px 0; 
                    transform: translate3d(0, 0, 0) rotateY(${angle}deg);`
                 : `transform-origin: 0 0; 
@@ -74,7 +75,7 @@ export class HTMLPage extends Page {
         let polygon = 'polygon( ';
         for (const p of this.state.area) {
             if (p !== null) {
-                let g = this.render.getDirection() === 1 /* FlipDirection.BACK */
+                let g = this.render.getDirection() === FlipDirection.BACK
                     ? {
                         x: -p.x + this.state.position.x,
                         y: p.y - this.state.position.y,
@@ -100,7 +101,7 @@ export class HTMLPage extends Page {
         const rect = this.render.getRect();
         const pageWidth = rect.pageWidth;
         const pageHeight = rect.height;
-        const x = orient === 1 /* PageOrientation.RIGHT */ ? rect.left + rect.pageWidth : rect.left;
+        const x = orient === PageOrientation.RIGHT ? rect.left + rect.pageWidth : rect.left;
         const y = rect.top;
         this.element.classList.add('__simple');
         this.element.style.cssText = `
@@ -121,7 +122,7 @@ export class HTMLPage extends Page {
     setOrientation(orientation) {
         super.setOrientation(orientation);
         this.element.classList.remove('__left', '__right');
-        this.element.classList.add(orientation === 1 /* PageOrientation.RIGHT */ ? '__right' : '__left');
+        this.element.classList.add(orientation === PageOrientation.RIGHT ? '__right' : '__left');
     }
     setDrawingDensity(density) {
         this.element.classList.remove('__soft', '__hard');

@@ -1,9 +1,10 @@
 import { Orientation, Render } from '../Render/Render';
 import { PageFlip } from '../PageFlip';
 import { Helper } from '../Helper';
-import { PageRect, Point } from '../BasicTypes';
+import type { PageRect, Point } from '../BasicTypes';
 import { FlipCalculation } from './FlipCalculation';
 import { Page, PageDensity } from '../Page/Page';
+import {ClickFlipType} from '../Settings';
 
 /**
  * Flipping direction
@@ -77,7 +78,23 @@ export class Flip {
      * @param globalPos - Touch Point Coordinates (relative window)
      */
     public flip(globalPos: Point): void {
-        if (this.app.getSettings().disableFlipByClick && !this.isPointOnCorners(globalPos)) return;
+
+        let flipType: ClickFlipType = this.app.getSettings().clickFlipType;
+
+        if (flipType === ClickFlipType.DISABLE_FLIPPING){
+            return;
+        }
+
+        if (flipType === ClickFlipType.ONLY_ON_CORNERS){
+            const on_corner = this.isPointOnCorners(globalPos);
+            if (! on_corner) {
+                return;
+            }
+        }
+
+        // flipType is ONLY_VIA_API or ANYWHERE_ON_PAGE
+        // orginal was disableFlipByClick && !this.isPointOnCorners(globalPos)
+        // means you can flip the page by clicking on the corner
 
         // the flipiing process is already running
         if (this.calc !== null) this.render.finishAnimation();
@@ -430,6 +447,9 @@ export class Flip {
     }
 
     private isPointOnCorners(globalPos: Point): boolean {
+
+        // globalPos:relative to the book
+
         const rect = this.getBoundsRect();
         const pageWidth = rect.pageWidth;
 

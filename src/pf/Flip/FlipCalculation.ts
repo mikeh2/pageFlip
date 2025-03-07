@@ -1,5 +1,5 @@
 import { Helper } from '../Helper';
-import { Point, Rect, RectPoints, Segment } from '../BasicTypes';
+import type { Point, Rect, RectPoints, Segment } from '../BasicTypes';
 import { FlipCorner, FlipDirection } from './Flip';
 
 /**

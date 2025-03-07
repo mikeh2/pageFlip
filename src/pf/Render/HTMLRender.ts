@@ -4,7 +4,7 @@ import { FlipDirection } from '../Flip/Flip';
 import { PageDensity, PageOrientation } from '../Page/Page';
 import { HTMLPage } from '../Page/HTMLPage';
 import { Helper } from '../Helper';
-import { FlipSetting } from '../Settings';
+import type { FlipSetting } from '../Settings';
 
 /**
  * Class responsible for rendering the HTML book
@@ -28,8 +28,8 @@ export class HTMLRender extends Render {
      * @param {FlipSetting} setting - Configuration object
      * @param {HTMLElement} element - Parent HTML Element
      */
-    constructor(app: PageFlip, setting: FlipSetting, element: HTMLElement) {
-        super(app, setting);
+    constructor(app: PageFlip, element: HTMLElement) {
+        super(app);
 
         this.element = element;
 
@@ -288,6 +288,8 @@ export class HTMLRender extends Render {
      */
     private drawRightPage(): void {
         if (this.rightPage === null) return;
+
+        // PORTRAIT is always the right page
 
         if (
             this.direction === FlipDirection.FORWARD &&

@@ -1,6 +1,6 @@
 import { UI } from './UI';
 import { PageFlip } from '../PageFlip';
-import { FlipSetting } from '../Settings';
+import type { FlipSetting } from '../Settings';
 
 /**
  * UI for HTML mode
@@ -11,10 +11,9 @@ export class HTMLUI extends UI {
     constructor(
         inBlock: HTMLElement,
         app: PageFlip,
-        setting: FlipSetting,
         items: NodeListOf<HTMLElement> | HTMLElement[]
     ) {
-        super(inBlock, app, setting);
+        super(inBlock, app);
 
         // Second wrapper to HTML page
         this.wrapper.insertAdjacentHTML('afterbegin', '<div class="stf__block"></div>');

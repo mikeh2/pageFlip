@@ -1,7 +1,7 @@
 import { PageCollection } from './Collection/PageCollection';
 import { ImagePageCollection } from './Collection/ImagePageCollection';
 import { HTMLPageCollection } from './Collection/HTMLPageCollection';
-import { PageRect, Point } from './BasicTypes';
+import type { PageRect, Point } from './BasicTypes';
 import { Flip, FlipCorner, FlippingState } from './Flip/Flip';
 import { Orientation, Render } from './Render/Render';
 import { CanvasRender } from './Render/CanvasRender';
@@ -11,7 +11,8 @@ import { Helper } from './Helper';
 import { Page } from './Page/Page';
 import { EventObject } from './Event/EventObject';
 import { HTMLRender } from './Render/HTMLRender';
-import { FlipSetting, Settings } from './Settings';
+import type { FlipSetting} from './Settings';
+import { Settings, ClickFlipType } from './Settings';
 import { UI } from './UI/UI';
 
 import './Style/stPageFlip.css';
@@ -26,7 +27,7 @@ export class PageFlip extends EventObject {
     private isUserTouch = false;
     private isUserMove = false;
 
-    private readonly setting: FlipSetting = null;
+    private setting: FlipSetting;
     private readonly block: HTMLElement; // Root HTML Element
 
     private pages: PageCollection = null;
@@ -47,6 +48,12 @@ export class PageFlip extends EventObject {
 
         this.setting = new Settings().getSettings(setting);
         this.block = inBlock;
+    }
+
+    public setSettings(settings:FlipSetting) {
+        this.ui.removeHandlers()
+        this.setting = settings
+        this.ui.setHandlers()
     }
 
     /**
@@ -71,10 +78,10 @@ export class PageFlip extends EventObject {
      * @param {string[]} imagesHref - List of paths to images
      */
     public loadFromImages(imagesHref: string[]): void {
-        this.ui = new CanvasUI(this.block, this, this.setting);
+        this.ui = new CanvasUI(this.block, this);
 
         const canvas = (this.ui as CanvasUI).getCanvas();
-        this.render = new CanvasRender(this, this.setting, canvas);
+        this.render = new CanvasRender(this, canvas);
 
         this.flipController = new Flip(this.render, this);
 
@@ -83,13 +90,13 @@ export class PageFlip extends EventObject {
 
         this.render.start();
 
-        this.pages.show(this.setting.startPage);
+        this.pages.show(this.getSettings().startPage);
 
         // safari fix
         setTimeout(() => {
             this.ui.update();
             this.trigger('init', this, {
-                page: this.setting.startPage,
+                page: this.getSettings().startPage,
                 mode: this.render.getOrientation(),
             });
         }, 1);
@@ -101,9 +108,9 @@ export class PageFlip extends EventObject {
      * @param {(NodeListOf<HTMLElement>|HTMLElement[])} items - List of pages as HTML Element
      */
     public loadFromHTML(items: NodeListOf<HTMLElement> | HTMLElement[]): void {
-        this.ui = new HTMLUI(this.block, this, this.setting, items);
+        this.ui = new HTMLUI(this.block, this, items);
 
-        this.render = new HTMLRender(this, this.setting, this.ui.getDistElement());
+        this.render = new HTMLRender(this, this.ui.getDistElement());
 
         this.flipController = new Flip(this.render, this);
 
@@ -112,13 +119,13 @@ export class PageFlip extends EventObject {
 
         this.render.start();
 
-        this.pages.show(this.setting.startPage);
+        this.pages.show(this.getSettings().startPage);
 
         // safari fix
         setTimeout(() => {
             this.ui.update();
             this.trigger('init', this, {
-                page: this.setting.startPage,
+                page: this.getSettings().startPage,
                 mode: this.render.getOrientation(),
             });
         }, 1);
@@ -370,7 +377,13 @@ export class PageFlip extends EventObject {
      * @param {boolean} isTouch - True if there was a touch event, not a mouse click
      */
     public userMove(pos: Point, isTouch: boolean): void {
-        if (!this.isUserTouch && !isTouch && this.setting.showPageCorners) {
+
+        // let margin = 10
+        // let w = this.getSettings().width + margin;
+        // let h = this.getSettings().height + margin;
+        // if (pos.x < -margin || pos.x > w || pos.y < -margin || pos.y > h) return;
+        
+        if (!this.isUserTouch && !isTouch && this.getSettings().showPageCorners) {
             this.flipController.showCorner(pos); // fold Page Corner
         } else if (this.isUserTouch) {
             if (Helper.GetDistanceBetweenTwoPoint(this.mousePosition, pos) > 5) {

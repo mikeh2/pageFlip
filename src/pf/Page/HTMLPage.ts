@@ -2,7 +2,7 @@ import { Page, PageDensity, PageOrientation } from './Page';
 import { Render } from '../Render/Render';
 import { Helper } from '../Helper';
 import { FlipDirection } from '../Flip/Flip';
-import { Point } from '../BasicTypes';
+import type { Point } from '../BasicTypes';
 
 /**
  * Class representing a book page as a HTML Element
@@ -20,7 +20,7 @@ export class HTMLPage extends Page {
 
         this.element = element;
         this.element.classList.add('stf__item');
-        this.element.classList.add('--' + density);
+        this.element.classList.add('__' + density);
     }
 
     public newTemporaryCopy(): Page {
@@ -61,7 +61,7 @@ export class HTMLPage extends Page {
         const pageWidth = this.render.getRect().pageWidth;
         const pageHeight = this.render.getRect().height;
 
-        this.element.classList.remove('--simple');
+        this.element.classList.remove('__simple');
 
         const commonStyle = `
             display: block;
@@ -141,7 +141,7 @@ export class HTMLPage extends Page {
 
         const y = rect.top;
 
-        this.element.classList.add('--simple');
+        this.element.classList.add('__simple');
         this.element.style.cssText = `
             position: absolute; 
             display: block; 
@@ -162,14 +162,13 @@ export class HTMLPage extends Page {
 
     public setOrientation(orientation: PageOrientation): void {
         super.setOrientation(orientation);
-        this.element.classList.remove('--left', '--right');
-
-        this.element.classList.add(orientation === PageOrientation.RIGHT ? '--right' : '--left');
+        this.element.classList.remove('__left', '__right');
+        this.element.classList.add(orientation === PageOrientation.RIGHT ? '__right' : '__left');
     }
 
     public setDrawingDensity(density: PageDensity): void {
-        this.element.classList.remove('--soft', '--hard');
-        this.element.classList.add('--' + density);
+        this.element.classList.remove('__soft', '__hard');
+        this.element.classList.add('__' + density);
 
         super.setDrawingDensity(density);
     }

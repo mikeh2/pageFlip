@@ -1,5 +1,6 @@
 import { Render } from '../Render/Render';
-import { Point } from '../BasicTypes';
+import type { Point } from '../BasicTypes';
+import { Orientation } from '../Render/Render';
 
 /**
  * State of the page on the basis of which rendering
@@ -23,10 +24,10 @@ export interface PageState {
 
 export const enum PageOrientation {
     /** Left side page */
-    LEFT,
+    LEFT = 0,
 
     /** Right side page */
-    RIGHT,
+    RIGHT = 1,
 }
 
 export const enum PageDensity {
@@ -44,7 +45,7 @@ export abstract class Page {
     protected render: Render;
 
     /** Page Orientation */
-    protected orientation: PageOrientation;
+    protected orientation: PageOrientation = PageOrientation.RIGHT;
 
     /** Density at creation */
     protected createdDensity: PageDensity;

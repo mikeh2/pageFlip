@@ -2,7 +2,7 @@ import { Orientation, Render } from './Render';
 import { PageFlip } from '../PageFlip';
 import { FlipDirection } from '../Flip/Flip';
 import { PageOrientation } from '../Page/Page';
-import { FlipSetting } from '../Settings';
+import type { FlipSetting } from '../Settings';
 
 /**
  * Class responsible for rendering the Canvas book
@@ -11,11 +11,12 @@ export class CanvasRender extends Render {
     private readonly canvas: HTMLCanvasElement;
     private readonly ctx: CanvasRenderingContext2D;
 
-    constructor(app: PageFlip, setting: FlipSetting, inCanvas: HTMLCanvasElement) {
-        super(app, setting);
+    constructor(app: PageFlip, inCanvas: HTMLCanvasElement) {
+        super(app);
 
         this.canvas = inCanvas;
         this.ctx = inCanvas.getContext('2d');
+        console.log('CanvasRender constructor', this.canvas, this.ctx);
     }
 
     public getContext(): CanvasRenderingContext2D {

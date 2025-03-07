@@ -1,8 +1,8 @@
 import { PageFlip } from '../PageFlip';
-import { Point, PageRect, RectPoints } from '../BasicTypes';
+import type { Point, PageRect, RectPoints } from '../BasicTypes';
 import { FlipDirection } from '../Flip/Flip';
 import { Page, PageOrientation } from '../Page/Page';
-import { FlipSetting, SizeType } from '../Settings';
+import type { FlipSetting} from '../Settings';
 
 type FrameAction = () => void;
 type AnimationSuccessAction = () => void;
@@ -54,7 +54,6 @@ export const enum Orientation {
  * Class responsible for rendering the book
  */
 export abstract class Render {
-    protected readonly setting: FlipSetting;
     protected readonly app: PageFlip;
 
     /** Left static book page */
@@ -90,8 +89,7 @@ export abstract class Render {
      */
     private safari = false;
 
-    protected constructor(app: PageFlip, setting: FlipSetting) {
-        this.setting = setting;
+    protected constructor(app: PageFlip) {
         this.app = app;
 
         // detect safari
@@ -202,57 +200,42 @@ export abstract class Render {
      * Calculate the size and position of the book depending on the parent element and configuration parameters
      */
     private calculateBoundsRect(): Orientation {
-        let orientation = Orientation.LANDSCAPE;
 
+        // parent element (stf__block)
+        let wrapper = this.app.getUI().getDistElement();
         const blockWidth = this.getBlockWidth();
+        const blockHeight = this.getBlockHeight();
         const middlePoint: Point = {
             x: blockWidth / 2,
-            y: this.getBlockHeight() / 2,
+            y: blockHeight / 2,
         };
+        // effect-wise, a 0 margin is best
+        let margin = 0;
+        let w = this.app.getSettings().width;
+        let h = this.app.getSettings().height;
 
-        const ratio = this.setting.width / this.setting.height;
+        // portrait mode
+        // this is needed for offscreen rendering
+        let canvas_width = w * 2;
 
-        let pageWidth = this.setting.width;
-        let pageHeight = this.setting.height;
+        let orientation = this.app.getSettings().orientation; 
+        let pw = w - margin*2;
+        let ph = h - margin*2;
+        let left = -w + margin*2; 
 
-        let left = middlePoint.x - pageWidth;
-
-        if (this.setting.size === SizeType.STRETCH) {
-            if (blockWidth < this.setting.minWidth * 2 && this.app.getSettings().usePortrait)
-                orientation = Orientation.PORTRAIT;
-
-            pageWidth =
-                orientation === Orientation.PORTRAIT
-                    ? this.getBlockWidth()
-                    : this.getBlockWidth() / 2;
-
-            if (pageWidth > this.setting.maxWidth) pageWidth = this.setting.maxWidth;
-
-            pageHeight = pageWidth / ratio;
-            if (pageHeight > this.getBlockHeight()) {
-                pageHeight = this.getBlockHeight();
-                pageWidth = pageHeight * ratio;
-            }
-
-            left =
-                orientation === Orientation.PORTRAIT
-                    ? middlePoint.x - pageWidth / 2 - pageWidth
-                    : middlePoint.x - pageWidth;
-        } else {
-            if (blockWidth < pageWidth * 2) {
-                if (this.app.getSettings().usePortrait) {
-                    orientation = Orientation.PORTRAIT;
-                    left = middlePoint.x - pageWidth / 2 - pageWidth;
-                }
-            }
+        if (orientation === Orientation.LANDSCAPE) {
+            pw = w/2 - margin*2;
+            left = margin*2 
+            canvas_width = w;
+        }else{  
+            left = middlePoint.x - pw / 2 - pw
         }
-
         this.boundsRect = {
-            left,
-            top: middlePoint.y - pageHeight / 2,
-            width: pageWidth * 2,
-            height: pageHeight,
-            pageWidth: pageWidth,
+            left:left,
+            top: margin,
+            width: canvas_width,
+            height:h-margin*2,
+            pageWidth: pw,
         };
 
         return orientation;

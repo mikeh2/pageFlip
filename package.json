@@ -11,9 +11,20 @@
     "dist"
   ],
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+    ".": [
+      {
+        "import": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      },
+      "./dist/index.cjs"
+    ],
+    "./Render/*": {
+      "import": "./dist/Render/*.js",
+      "types": "./dist/Render/*.d.ts"
+    },
+    "./Settings": {
+      "import": "./dist/Settings.js",
+      "types": "./dist/Settings.d.ts"
     }
   },
   "devDependencies": {

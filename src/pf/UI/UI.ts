@@ -1,7 +1,7 @@
 import { PageFlip } from '../PageFlip';
 import type { Point } from '../BasicTypes';
-import { FlipCorner, FlippingState } from '../Flip/Flip';
-import { Orientation } from '../Render/Render';
+import { FlipCorner, FlippingState } from '../BasicTypes';
+import { Orientation } from '../Settings';
 import { ClickFlipType} from '../Settings';
 
 type SwipeData = {

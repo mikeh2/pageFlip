@@ -1,8 +1,8 @@
 import { PageFlip } from '../PageFlip';
 import type { Point, PageRect, RectPoints } from '../BasicTypes';
-import { FlipDirection } from '../Flip/Flip';
+import { FlipDirection } from '../BasicTypes';
 import { Page } from '../Page/Page';
-import type { FlipSetting } from '../Settings';
+import { Orientation, type FlipSetting } from '../Settings';
 type FrameAction = () => void;
 type AnimationSuccessAction = () => void;
 /**
@@ -38,13 +38,6 @@ type AnimationProcess = {
     /** Animation start time (Global Timer) */
     startedAt: number;
 };
-/**
- * Book orientation
- */
-export declare enum Orientation {
-    PORTRAIT = "portrait",
-    LANDSCAPE = "landscape"
-}
 /**
  * Class responsible for rendering the book
  */

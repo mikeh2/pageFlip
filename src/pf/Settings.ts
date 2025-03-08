@@ -1,5 +1,9 @@
-import { Orientation } from './Render/Render'; 
+// Book orientation
 
+export enum Orientation {
+    PORTRAIT = 'portrait',
+    LANDSCAPE = 'landscape'
+}
 
 export enum ClickFlipType {
     // auto set useMouseEvents = true

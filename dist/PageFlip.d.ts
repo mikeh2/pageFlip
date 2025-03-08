@@ -1,7 +1,9 @@
 import { PageCollection } from './Collection/PageCollection';
 import type { PageRect, Point } from './BasicTypes';
-import { Flip, FlipCorner, FlippingState } from './Flip/Flip';
-import { Orientation, Render } from './Render/Render';
+import { Flip } from './Flip/Flip';
+import { FlipCorner, FlippingState } from './BasicTypes';
+import { Render } from './Render/Render';
+import { Orientation } from './Settings';
 import { Page } from './Page/Page';
 import { EventObject } from './Event/EventObject';
 import type { FlipSetting } from './Settings';

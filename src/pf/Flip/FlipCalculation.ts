@@ -1,6 +1,6 @@
 import { Helper } from '../Helper';
 import type { Point, Rect, RectPoints, Segment } from '../BasicTypes';
-import { FlipCorner, FlipDirection } from './Flip';
+import { FlipCorner, FlipDirection } from '../BasicTypes';
 
 /**
  * Class representing mathematical methods for calculating page position (rotation angle, clip area ...)

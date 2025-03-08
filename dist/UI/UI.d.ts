@@ -1,5 +1,5 @@
 import { PageFlip } from '../PageFlip';
-import { Orientation } from '../Render/Render';
+import { Orientation } from '../Settings';
 /**
  * UI Class, represents work with DOM
  */

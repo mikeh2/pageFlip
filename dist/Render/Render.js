@@ -1,13 +1,6 @@
-import { FlipDirection } from '../Flip/Flip';
+import { FlipDirection } from '../BasicTypes';
 import { PageOrientation } from '../Page/Page';
-/**
- * Book orientation
- */
-export var Orientation;
-(function (Orientation) {
-    Orientation["PORTRAIT"] = "portrait";
-    Orientation["LANDSCAPE"] = "landscape";
-})(Orientation || (Orientation = {}));
+import { Orientation } from '../Settings';
 /**
  * Class responsible for rendering the book
  */

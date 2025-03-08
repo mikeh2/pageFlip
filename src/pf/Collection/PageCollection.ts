@@ -1,7 +1,8 @@
-import { Orientation, Render } from '../Render/Render';
+import { Render } from '../Render/Render';
+import { Orientation } from '../Settings';
 import { Page, PageDensity } from '../Page/Page';
 import { PageFlip } from '../PageFlip';
-import { FlipDirection } from '../Flip/Flip';
+import { FlipDirection } from '../BasicTypes';
 
 type NumberArray = number[];
 

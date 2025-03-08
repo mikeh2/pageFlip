@@ -1,43 +1,11 @@
-import { Orientation, Render } from '../Render/Render';
+import { Render } from '../Render/Render';
+import { Orientation } from '../Settings';
 import { PageFlip } from '../PageFlip';
 import { Helper } from '../Helper';
-import type { PageRect, Point } from '../BasicTypes';
+import { FlipCorner, FlipDirection, FlippingState, type PageRect, type Point } from '../BasicTypes';
 import { FlipCalculation } from './FlipCalculation';
 import { Page, PageDensity } from '../Page/Page';
 import {ClickFlipType} from '../Settings';
-
-/**
- * Flipping direction
- */
-export enum FlipDirection {
-    FORWARD,
-    BACK,
-}
-
-/**
- * Active corner when flipping
- */
-export enum FlipCorner {
-    TOP = 'top',
-    BOTTOM = 'bottom',
-}
-
-/**
- * State of the book
- */
-export enum FlippingState {
-    /** The user folding the page */
-    USER_FOLD = 'user_fold',
-
-    /** Mouse over active corners */
-    FOLD_CORNER = 'fold_corner',
-
-    /** During flipping animation */
-    FLIPPING = 'flipping',
-
-    /** Base state */
-    READ = 'read',
-}
 
 /**
  * Class representing the flipping process

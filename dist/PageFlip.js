@@ -1,6 +1,7 @@
 import { ImagePageCollection } from './Collection/ImagePageCollection';
 import { HTMLPageCollection } from './Collection/HTMLPageCollection';
-import { Flip, FlipCorner } from './Flip/Flip';
+import { Flip } from './Flip/Flip';
+import { FlipCorner } from './BasicTypes';
 import { CanvasRender } from './Render/CanvasRender';
 import { HTMLUI } from './UI/HTMLUI';
 import { CanvasUI } from './UI/CanvasUI';

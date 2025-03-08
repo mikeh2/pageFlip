@@ -1,6 +1,6 @@
-import { Orientation } from '../Render/Render';
+import { Orientation } from '../Settings';
 import { PageDensity } from '../Page/Page';
-import { FlipDirection } from '../Flip/Flip';
+import { FlipDirection } from '../BasicTypes';
 /**
  * Сlass representing a collection of pages
  */

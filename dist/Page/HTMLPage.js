@@ -1,6 +1,6 @@
 import { Page, PageDensity, PageOrientation } from './Page';
 import { Helper } from '../Helper';
-import { FlipDirection } from '../Flip/Flip';
+import { FlipDirection } from '../BasicTypes';
 /**
  * Class representing a book page as a HTML Element
  */

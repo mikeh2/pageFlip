@@ -1,5 +1,6 @@
-import { Orientation, Render } from './Render';
-import { FlipDirection } from '../Flip/Flip';
+import { Render } from './Render';
+import { Orientation } from '../Settings';
+import { FlipDirection } from '../BasicTypes';
 import { PageDensity, PageOrientation } from '../Page/Page';
 import { Helper } from '../Helper';
 /**

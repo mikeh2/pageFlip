@@ -1,6 +1,6 @@
 import { Render } from '../Render/Render';
 import type { Point } from '../BasicTypes';
-import { Orientation } from '../Render/Render';
+import { Orientation } from '../Settings';
 
 /**
  * State of the page on the basis of which rendering

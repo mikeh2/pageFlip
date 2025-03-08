@@ -11,20 +11,17 @@
     "dist"
   ],
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./Render/Render": {
-      "import": "./dist/Render/Render.js",
-      "types": "./dist/Render/Render.d.ts"
-    },
-    "./Settings": {
-      "import": "./dist/Settings.js",
-      "types": "./dist/Settings.d.ts"
-    }
+  ".": {
+    "import": "./dist/bundle.js",
+    "types": "./dist/index.d.ts"
   },
+   "./Style/stPageFlip.css": "./dist/Style/stPageFlip.css"
+  },
+  
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "rollup": "^4.34.9",
     "typescript": "^5.8.2"
   }
 }

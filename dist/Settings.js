@@ -1,4 +1,9 @@
-import { Orientation } from './Render/Render';
+// Book orientation
+export var Orientation;
+(function (Orientation) {
+    Orientation["PORTRAIT"] = "portrait";
+    Orientation["LANDSCAPE"] = "landscape";
+})(Orientation || (Orientation = {}));
 export var ClickFlipType;
 (function (ClickFlipType) {
     // auto set useMouseEvents = true

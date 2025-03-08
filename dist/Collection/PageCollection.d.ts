@@ -1,7 +1,7 @@
 import { Render } from '../Render/Render';
 import { Page } from '../Page/Page';
 import { PageFlip } from '../PageFlip';
-import { FlipDirection } from '../Flip/Flip';
+import { FlipDirection } from '../BasicTypes';
 type NumberArray = number[];
 /**
  * Сlass representing a collection of pages

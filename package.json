@@ -1,23 +1,22 @@
 {
   "name": "@mikeh/pageflip",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/bundle.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "tsc & cp -r src/pf/Style dist/"
+    "build": "tsc && mkdir -p dist/Style && cp -r src/pf/Style/stPageFlip.css dist/Style/"
   },
   "files": [
     "dist"
   ],
   "exports": {
-  ".": {
-    "import": "./dist/bundle.js",
-    "types": "./dist/index.d.ts"
+    ".": {
+      "import": "./dist/bundle.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./Style/stPageFlip.css": "./dist/Style/stPageFlip.css"
   },
-   "./Style/stPageFlip.css": "./dist/Style/stPageFlip.css"
-  },
-  
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.3",
     "@rollup/plugin-node-resolve": "^16.0.0",

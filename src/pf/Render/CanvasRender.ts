@@ -2,7 +2,7 @@ import { Render } from './Render';
 import { Orientation } from '../Settings';
 import { PageFlip } from '../PageFlip';
 import { FlipDirection } from '../BasicTypes';
-import { PageOrientation } from '../Page/Page';
+import { PageOrientation } from '../BasicTypes';
 import type { FlipSetting } from '../Settings';
 
 /**

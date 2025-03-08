@@ -1,7 +1,7 @@
 {
   "name": "@mikeh/pageflip",
   "version": "1.0.0",
-  "main": "dist/bundle.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
@@ -12,10 +12,9 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/bundle.js",
+      "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    },
-    "./Style/stPageFlip.css": "./dist/Style/stPageFlip.css"
+    }
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.3",

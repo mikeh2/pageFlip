@@ -1,5 +1,5 @@
 import { Orientation } from '../Settings';
-import { PageDensity } from '../Page/Page';
+import { PageDensity } from '../BasicTypes';
 import { FlipDirection } from '../BasicTypes';
 /**
  * Сlass representing a collection of pages

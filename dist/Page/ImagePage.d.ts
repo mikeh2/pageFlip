@@ -1,4 +1,5 @@
-import { Page, PageDensity, PageOrientation } from './Page';
+import { Page } from './Page';
+import { PageDensity, PageOrientation } from '../BasicTypes';
 import { Render } from '../Render/Render';
 /**
  * Class representing a book page as an image on Canvas

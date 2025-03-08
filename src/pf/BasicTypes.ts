@@ -79,3 +79,36 @@ export enum FlippingState {
     /** Base state */
     READ = 'read'
 }
+/**
+ * State of the page on the basis of which rendering
+ */
+
+export interface PageState {
+    /** Page rotation angle */
+    angle: number;
+
+    /** Page scope */
+    area: Point[];
+
+    /** Page position */
+    position: Point;
+
+    /** Rotate angle for hard pages */
+    hardAngle: number;
+
+    /** Rotate angle for hard pages at renedering time */
+    hardDrawingAngle: number;
+}
+
+export enum PageOrientation {
+    /** Left side page */
+    LEFT = 0,
+
+    /** Right side page */
+    RIGHT = 1
+}
+
+export enum PageDensity {
+    SOFT = 'soft',
+    HARD = 'hard'
+}

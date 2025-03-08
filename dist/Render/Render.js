@@ -1,5 +1,5 @@
 import { FlipDirection } from '../BasicTypes';
-import { PageOrientation } from '../Page/Page';
+import { PageOrientation } from '../BasicTypes';
 import { Orientation } from '../Settings';
 /**
  * Class responsible for rendering the book

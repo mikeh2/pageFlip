@@ -1,6 +1,6 @@
 import { HTMLPage } from '../Page/HTMLPage';
 import { PageCollection } from './PageCollection';
-import { PageDensity } from '../Page/Page';
+import { PageDensity } from '../BasicTypes';
 /**
  * Сlass representing a collection of pages as HTML Element
  */

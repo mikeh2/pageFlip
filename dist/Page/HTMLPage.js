@@ -1,4 +1,5 @@
-import { Page, PageDensity, PageOrientation } from './Page';
+import { Page } from './Page';
+import { PageDensity, PageOrientation } from '../BasicTypes';
 import { Helper } from '../Helper';
 import { FlipDirection } from '../BasicTypes';
 /**

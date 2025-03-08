@@ -4,7 +4,8 @@ import { PageFlip } from '../PageFlip';
 import { Helper } from '../Helper';
 import { FlipCorner, FlipDirection, FlippingState, type PageRect, type Point } from '../BasicTypes';
 import { FlipCalculation } from './FlipCalculation';
-import { Page, PageDensity } from '../Page/Page';
+import { Page } from '../Page/Page';
+import { PageDensity } from '../BasicTypes';
 import {ClickFlipType} from '../Settings';
 
 /**

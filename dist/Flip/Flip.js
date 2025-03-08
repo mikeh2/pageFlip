@@ -2,7 +2,7 @@ import { Orientation } from '../Settings';
 import { Helper } from '../Helper';
 import { FlipCorner, FlipDirection, FlippingState } from '../BasicTypes';
 import { FlipCalculation } from './FlipCalculation';
-import { PageDensity } from '../Page/Page';
+import { PageDensity } from '../BasicTypes';
 import { ClickFlipType } from '../Settings';
 /**
  * Class representing the flipping process

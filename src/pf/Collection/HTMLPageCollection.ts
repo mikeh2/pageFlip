@@ -2,7 +2,7 @@ import { HTMLPage } from '../Page/HTMLPage';
 import { Render } from '../Render/Render';
 import { PageCollection } from './PageCollection';
 import { PageFlip } from '../PageFlip';
-import { PageDensity } from '../Page/Page';
+import { PageDensity } from '../BasicTypes';
 
 /**
  * Сlass representing a collection of pages as HTML Element

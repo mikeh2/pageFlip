@@ -1,4 +1,5 @@
-import { Page, PageOrientation } from './Page';
+import { Page } from './Page';
+import { PageOrientation } from '../BasicTypes';
 /**
  * Class representing a book page as an image on Canvas
  */

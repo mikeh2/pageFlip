@@ -1,7 +1,8 @@
 import { PageFlip } from '../PageFlip';
 import type { Point, PageRect, RectPoints } from '../BasicTypes';
 import { FlipDirection } from '../BasicTypes';
-import { Page, PageOrientation } from '../Page/Page';
+import { Page } from '../Page/Page';
+import { PageOrientation } from '../BasicTypes';
 import { Orientation, type FlipSetting} from '../Settings';
 
 type FrameAction = () => void;

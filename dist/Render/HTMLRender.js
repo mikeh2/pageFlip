@@ -1,7 +1,7 @@
 import { Render } from './Render';
 import { Orientation } from '../Settings';
 import { FlipDirection } from '../BasicTypes';
-import { PageDensity, PageOrientation } from '../Page/Page';
+import { PageDensity, PageOrientation } from '../BasicTypes';
 import { Helper } from '../Helper';
 /**
  * Class responsible for rendering the HTML book

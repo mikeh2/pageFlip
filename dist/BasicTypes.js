@@ -28,4 +28,16 @@ export var FlippingState;
     /** Base state */
     FlippingState["READ"] = "read";
 })(FlippingState || (FlippingState = {}));
+export var PageOrientation;
+(function (PageOrientation) {
+    /** Left side page */
+    PageOrientation[PageOrientation["LEFT"] = 0] = "LEFT";
+    /** Right side page */
+    PageOrientation[PageOrientation["RIGHT"] = 1] = "RIGHT";
+})(PageOrientation || (PageOrientation = {}));
+export var PageDensity;
+(function (PageDensity) {
+    PageDensity["SOFT"] = "soft";
+    PageDensity["HARD"] = "hard";
+})(PageDensity || (PageDensity = {}));
 //# sourceMappingURL=BasicTypes.js.map

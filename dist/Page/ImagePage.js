@@ -1,5 +1,6 @@
-import { Page } from './Page';
 import { PageOrientation } from '../BasicTypes';
+// import { Render } from '../Render/Render';
+import { Page } from './Page';
 /**
  * Class representing a book page as an image on Canvas
  */
@@ -14,6 +15,8 @@ export class ImagePage extends Page {
     }
     draw(tempDensity) {
         const ctx = this.render.getContext();
+        if (!ctx)
+            return;
         const pagePos = this.render.convertToGlobal(this.state.position);
         const pageWidth = this.render.getRect().pageWidth;
         const pageHeight = this.render.getRect().height;
@@ -32,6 +35,8 @@ export class ImagePage extends Page {
             this.drawLoader(ctx, { x: 0, y: 0 }, pageWidth, pageHeight);
         }
         else {
+            if (!this.image)
+                return;
             ctx.drawImage(this.image, 0, 0, pageWidth, pageHeight);
         }
         ctx.restore();
@@ -39,6 +44,8 @@ export class ImagePage extends Page {
     simpleDraw(orient) {
         const rect = this.render.getRect();
         const ctx = this.render.getContext();
+        if (!ctx)
+            return;
         const pageWidth = rect.pageWidth;
         const pageHeight = rect.height;
         const x = orient === PageOrientation.RIGHT ? rect.left + rect.pageWidth : rect.left;
@@ -47,6 +54,8 @@ export class ImagePage extends Page {
             this.drawLoader(ctx, { x, y }, pageWidth, pageHeight);
         }
         else {
+            if (!this.image)
+                return;
             ctx.drawImage(this.image, x, y, pageWidth, pageHeight);
         }
     }

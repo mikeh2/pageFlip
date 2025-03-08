@@ -1,8 +1,7 @@
-import { PageFlip } from '../PageFlip';
 import type { Point, PageRect, RectPoints } from '../BasicTypes';
 import { FlipDirection } from '../BasicTypes';
-import { Page } from '../Page/Page';
 import { Orientation, type FlipSetting } from '../Settings';
+import type { IApp, IRender, IPage } from '../BasicInterfaces';
 type FrameAction = () => void;
 type AnimationSuccessAction = () => void;
 /**
@@ -41,16 +40,16 @@ type AnimationProcess = {
 /**
  * Class responsible for rendering the book
  */
-export declare abstract class Render {
-    protected readonly app: PageFlip;
+export declare abstract class Render implements IRender {
+    protected readonly app: IApp;
     /** Left static book page */
-    protected leftPage: Page;
+    protected leftPage: IPage;
     /** Right static book page */
-    protected rightPage: Page;
+    protected rightPage: IPage;
     /** Page currently flipping */
-    protected flippingPage: Page;
+    protected flippingPage: IPage;
     /** Next page at the time of flipping */
-    protected bottomPage: Page;
+    protected bottomPage: IPage;
     /** Current flipping direction */
     protected direction: FlipDirection;
     /** Current book orientation */
@@ -71,7 +70,7 @@ export declare abstract class Render {
      * https://bugs.webkit.org/show_bug.cgi?id=126207
      */
     private safari;
-    protected constructor(app: PageFlip);
+    protected constructor(app: IApp);
     /**
      * Rendering action on each requestAnimationFrame call. The entire rendering process is performed only in this method
      */
@@ -164,23 +163,23 @@ export declare abstract class Render {
      *
      * @param page
      */
-    setRightPage(page: Page): void;
+    setRightPage(page: IPage): void;
     /**
      * Set left static book page
      * @param page
      */
-    setLeftPage(page: Page): void;
+    setLeftPage(page: IPage): void;
     /**
      * Set next page at the time of flipping
      * @param page
      */
-    setBottomPage(page: Page): void;
+    setBottomPage(page: IPage): void;
     /**
      * Set currently flipping page
      *
      * @param page
      */
-    setFlippingPage(page: Page): void;
+    setFlippingPage(page: IPage): void;
     /**
      * Coordinate conversion function. Window coordinates -> to book coordinates
      *

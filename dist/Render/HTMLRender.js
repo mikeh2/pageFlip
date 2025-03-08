@@ -1,8 +1,8 @@
-import { Render } from './Render';
 import { Orientation } from '../Settings';
 import { FlipDirection } from '../BasicTypes';
 import { PageDensity, PageOrientation } from '../BasicTypes';
 import { Helper } from '../Helper';
+import { Render } from './Render';
 /**
  * Class responsible for rendering the HTML book
  */
@@ -18,7 +18,7 @@ export class HTMLRender extends Render {
     /**
      * @constructor
      *
-     * @param {PageFlip} app - PageFlip object
+     * @param {IApp} app - PageFlip object
      * @param {FlipSetting} setting - Configuration object
      * @param {HTMLElement} element - Parent HTML Element
      */
@@ -251,7 +251,7 @@ export class HTMLRender extends Render {
         this.drawBottomPage();
         if (this.flippingPage != null) {
             this.flippingPage.getElement().style.zIndex = (this.getSettings().startZIndex + 5).toString(10);
-            this.flippingPage.draw();
+            this.flippingPage.draw(null);
         }
         if (this.shadow != null && this.flippingPage !== null) {
             if (this.flippingPage.getDrawingDensity() === PageDensity.SOFT) {

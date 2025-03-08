@@ -1,17 +1,15 @@
-import { Render } from '../Render/Render';
-import { Page } from '../Page/Page';
-import { PageFlip } from '../PageFlip';
 import { FlipDirection } from '../BasicTypes';
+import { IPage, IRender, IApp } from '../BasicInterfaces';
 type NumberArray = number[];
 /**
  * Сlass representing a collection of pages
  */
 export declare abstract class PageCollection {
-    protected readonly app: PageFlip;
-    protected readonly render: Render;
+    protected readonly app: IApp;
+    protected readonly render: IRender;
     protected readonly isShowCover: boolean;
     /** Pages List */
-    protected pages: Page[];
+    protected pages: IPage[];
     /** Index of the current page in list */
     protected currentPageIndex: number;
     /** Number of the current spread in book */
@@ -20,7 +18,7 @@ export declare abstract class PageCollection {
     protected landscapeSpread: NumberArray[];
     /**  One-page spread in portrait mode */
     protected portraitSpread: NumberArray[];
-    protected constructor(app: PageFlip, render: Render);
+    protected constructor(app: IApp, render: IRender);
     /**
      * Load pages
      */
@@ -50,37 +48,37 @@ export declare abstract class PageCollection {
     /**
      * Get the pages list
      */
-    getPages(): Page[];
+    getPages(): IPage[];
     /**
      * Get page by index
      *
      * @param {number} pageIndex
      */
-    getPage(pageIndex: number): Page;
+    getPage(pageIndex: number): IPage;
     /**
      * Get the next page from the specified
      *
      * @param {Page} current
      */
-    nextBy(current: Page): Page;
+    nextBy(current: IPage): IPage | null;
     /**
      * Get previous page from specified
      *
      * @param {Page} current
      */
-    prevBy(current: Page): Page;
+    prevBy(current: IPage): IPage | null;
     /**
      * Get flipping page depending on the direction
      *
      * @param {FlipDirection} direction
      */
-    getFlippingPage(direction: FlipDirection): Page;
+    getFlippingPage(direction: FlipDirection): IPage;
     /**
      * Get Next page at the time of flipping
      *
      * @param {FlipDirection}  direction
      */
-    getBottomPage(direction: FlipDirection): Page;
+    getBottomPage(direction: FlipDirection): IPage;
     /**
      * Show next spread
      */
@@ -97,7 +95,7 @@ export declare abstract class PageCollection {
      * Show specified page
      * @param {number} pageNum - Page index (from 0s)
      */
-    show(pageNum?: number): void;
+    show(pageNum?: number | null): void;
     /**
      * Index of the current page in list
      */
@@ -112,5 +110,13 @@ export declare abstract class PageCollection {
      * Show current spread
      */
     private showSpread;
+}
+export declare class EmptyColletion extends PageCollection {
+    constructor(app: IApp, render: IRender);
+    load(): void;
+    destroy(): void;
+    getSpreadIndexByPage(pageNum: number): number;
+    getPageCount(): number;
+    getPages(): IPage[];
 }
 export {};

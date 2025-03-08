@@ -1,11 +1,11 @@
 import { UI } from './UI';
-import { PageFlip } from '../PageFlip';
+import { IApp } from '../BasicInterfaces';
 /**
  * UI for HTML mode
  */
 export declare class HTMLUI extends UI {
     private items;
-    constructor(inBlock: HTMLElement, app: PageFlip, items: NodeListOf<HTMLElement> | HTMLElement[]);
+    constructor(inBlock: HTMLElement, app: IApp, items: NodeListOf<HTMLElement> | HTMLElement[]);
     clear(): void;
     /**
      * Update page list from HTMLElements

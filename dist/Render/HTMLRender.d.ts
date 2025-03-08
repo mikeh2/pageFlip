@@ -1,5 +1,5 @@
 import { Render } from './Render';
-import { PageFlip } from '../PageFlip';
+import type { IApp } from '../BasicInterfaces';
 /**
  * Class responsible for rendering the HTML book
  */
@@ -15,11 +15,11 @@ export declare class HTMLRender extends Render {
     /**
      * @constructor
      *
-     * @param {PageFlip} app - PageFlip object
+     * @param {IApp} app - PageFlip object
      * @param {FlipSetting} setting - Configuration object
      * @param {HTMLElement} element - Parent HTML Element
      */
-    constructor(app: PageFlip, element: HTMLElement);
+    constructor(app: IApp, element: HTMLElement);
     private createShadows;
     clearShadow(): void;
     reload(): void;

@@ -1,7 +1,6 @@
-import { Render } from '../Render/Render';
-import { PageFlip } from '../PageFlip';
 import { FlipCorner, FlippingState, type Point } from '../BasicTypes';
 import { FlipCalculation } from './FlipCalculation';
+import type { IApp, IRender } from '../BasicInterfaces';
 /**
  * Class representing the flipping process
  */
@@ -12,7 +11,7 @@ export declare class Flip {
     private bottomPage;
     private calc;
     private state;
-    constructor(render: Render, app: PageFlip);
+    constructor(render: IRender, app: IApp);
     /**
      * Called when the page folding (User drags page corner)
      *

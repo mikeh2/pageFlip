@@ -72,7 +72,7 @@ export class PageCollection {
         for (let i = 0; i < spread.length; i++)
             if (pageNum === spread[i][0] || pageNum === spread[i][1])
                 return i;
-        return null;
+        return -1;
     }
     /**
      * Get the total number of pages
@@ -199,7 +199,7 @@ export class PageCollection {
         if (pageNum < 0 || pageNum >= this.pages.length)
             return;
         const spreadIndex = this.getSpreadIndexByPage(pageNum);
-        if (spreadIndex !== null) {
+        if (spreadIndex !== -1) {
             this.currentSpreadIndex = spreadIndex;
             this.showSpread();
         }
@@ -251,5 +251,15 @@ export class PageCollection {
         this.currentPageIndex = spread[0];
         this.app.updatePageIndex(this.currentPageIndex);
     }
+}
+export class EmptyColletion extends PageCollection {
+    constructor(app, render) {
+        super(app, render);
+    }
+    load() { }
+    destroy() { }
+    getSpreadIndexByPage(pageNum) { return 0; }
+    getPageCount() { return 0; }
+    getPages() { return []; }
 }
 //# sourceMappingURL=PageCollection.js.map

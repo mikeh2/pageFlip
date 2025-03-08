@@ -1,4 +1,4 @@
-import { PageFlip } from '../PageFlip';
+import type { IApp } from "../BasicInterfaces";
 /**
  * Data type passed to the event handler
  */
@@ -7,8 +7,8 @@ export type DataType = number | string | boolean | object;
  * Type of object in event handlers
  */
 export interface WidgetEvent {
-    data: DataType;
-    object: PageFlip;
+    data: DataType | null;
+    object: IApp;
 }
 type EventCallback = (e: WidgetEvent) => void;
 /**
@@ -29,6 +29,6 @@ export declare abstract class EventObject {
      * @param {string} event - Event name
      */
     off(event: string): void;
-    protected trigger(eventName: string, app: PageFlip, data?: DataType): void;
+    protected trigger(eventName: string, app: IApp, data?: DataType | null): void;
 }
 export {};

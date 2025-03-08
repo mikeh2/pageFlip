@@ -1,11 +1,11 @@
-import { PageFlip } from '../PageFlip';
 import { Orientation } from '../Settings';
+import { IUI, IApp } from '../BasicInterfaces';
 /**
  * UI Class, represents work with DOM
  */
-export declare abstract class UI {
+export declare abstract class UI implements IUI {
     protected readonly parentElement: HTMLElement;
-    protected readonly app: PageFlip;
+    protected readonly app: IApp;
     protected readonly wrapper: HTMLElement;
     protected distElement: HTMLElement;
     private touchPoint;
@@ -19,7 +19,7 @@ export declare abstract class UI {
      * @param {PageFlip} app - PageFlip instanse
      * @param {FlipSetting} setting - Configuration object
      */
-    protected constructor(inBlock: HTMLElement, app: PageFlip);
+    protected constructor(inBlock: HTMLElement, app: IApp);
     /**
      * Destructor. Remove all HTML elements and all event handlers
      */
@@ -28,6 +28,7 @@ export declare abstract class UI {
      * Updating child components when resizing
      */
     abstract update(): void;
+    abstract clear(): void;
     /**
      * Get parent element for book
      *

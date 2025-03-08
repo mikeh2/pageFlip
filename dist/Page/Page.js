@@ -1,3 +1,4 @@
+// import { Render } from '../Render/Render';
 import { PageOrientation } from '../BasicTypes';
 /**
  * Class representing a book page

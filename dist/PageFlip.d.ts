@@ -1,20 +1,17 @@
-import { PageCollection } from './Collection/PageCollection';
 import type { PageRect, Point } from './BasicTypes';
 import { Flip } from './Flip/Flip';
 import { FlipCorner, FlippingState } from './BasicTypes';
-import { Render } from './Render/Render';
 import { Orientation } from './Settings';
-import { Page } from './Page/Page';
 import { EventObject } from './Event/EventObject';
 import type { FlipSetting } from './Settings';
-import { UI } from './UI/UI';
+import type { IPageCollection, IUI, IApp, IPage, IRender } from './BasicInterfaces';
 import './Style/stPageFlip.css';
 /**
  * Class representing a main PageFlip object
  *
  * @extends EventObject
  */
-export declare class PageFlip extends EventObject {
+export declare class PageFlip extends EventObject implements IApp {
     private mousePosition;
     private isUserTouch;
     private isUserMove;
@@ -138,13 +135,13 @@ export declare class PageFlip extends EventObject {
      * @param {number} pageIndex
      * @returns {Page}
      */
-    getPage(pageIndex: number): Page;
+    getPage(pageIndex: number): IPage;
     /**
      * Get the current rendering object
      *
      * @returns {Render}
      */
-    getRender(): Render;
+    getRender(): IRender;
     /**
      * Get current object responsible for flipping
      *
@@ -174,7 +171,7 @@ export declare class PageFlip extends EventObject {
      *
      * @returns {UI}
      */
-    getUI(): UI;
+    getUI(): IUI;
     /**
      * Get current flipping state
      *
@@ -186,7 +183,7 @@ export declare class PageFlip extends EventObject {
      *
      * @returns {PageCollection}
      */
-    getPageCollection(): PageCollection;
+    getPageCollection(): IPageCollection;
     /**
      * Start page turning. Called when a user clicks or touches
      *

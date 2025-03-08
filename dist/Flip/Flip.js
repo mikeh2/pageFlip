@@ -218,7 +218,9 @@ export class Flip {
         const rect = this.getBoundsRect();
         const pageWidth = rect.pageWidth;
         if (this.isPointOnCorners(globalPos)) {
-            if (this.calc === null) {
+            console.log('showCorner fix in place', this.calc);
+            // was === null
+            if (this.calc != null) {
                 if (!this.start(globalPos))
                     return;
                 this.setState(FlippingState.FOLD_CORNER);

@@ -1,21 +1,22 @@
-import { Render } from '../Render/Render';
 import { PageDensity, PageOrientation } from '../BasicTypes';
 import type { PageState, Point } from '../BasicTypes';
+import type { IPage } from '../BasicInterfaces';
+import type { IRender } from '../BasicInterfaces';
 /**
  * Class representing a book page
  */
-export declare abstract class Page {
+export declare abstract class Page implements IPage {
     /** State of the page on the basis of which rendering */
     protected state: PageState;
     /** Render object */
-    protected render: Render;
+    protected render: IRender;
     /** Page Orientation */
     protected orientation: PageOrientation;
     /** Density at creation */
     protected createdDensity: PageDensity;
     /** Density at the time of rendering (Depends on neighboring pages) */
     protected nowDrawingDensity: PageDensity;
-    protected constructor(render: Render, density: PageDensity);
+    protected constructor(render: IRender, density: PageDensity);
     /**
      * Render static page
      *
@@ -27,7 +28,7 @@ export declare abstract class Page {
      *
      * @param {PageDensity} tempDensity - Density at the time of rendering
      */
-    abstract draw(tempDensity?: PageDensity): void;
+    abstract draw(tempDensity: PageDensity | null): void;
     /**
      * Page loading
      */

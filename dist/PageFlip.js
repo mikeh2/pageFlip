@@ -22,8 +22,8 @@ export class PageFlip extends EventObject {
     setting;
     block; // Root HTML Element
     pages = null;
-    flipController;
-    render;
+    flipController = null;
+    render = null;
     ui;
     /**
      * Create a new PageFlip instance
@@ -54,7 +54,9 @@ export class PageFlip extends EventObject {
      */
     update() {
         this.render.update();
-        this.pages.show();
+        if (this.pages) {
+            this.pages.show(null);
+        }
     }
     /**
      * Load pages from images on the Canvas mode

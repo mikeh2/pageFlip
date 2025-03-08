@@ -28,22 +28,26 @@ export class CanvasRender extends Render {
         if (this.rightPage != null)
             this.rightPage.simpleDraw(PageOrientation.RIGHT);
         if (this.bottomPage != null)
-            this.bottomPage.draw();
+            this.bottomPage.draw(null);
         this.drawBookShadow();
         if (this.flippingPage != null)
-            this.flippingPage.draw();
+            this.flippingPage.draw(null);
         if (this.shadow != null) {
             this.drawOuterShadow();
             this.drawInnerShadow();
         }
         const rect = this.getRect();
-        if (this.orientation === Orientation.PORTRAIT) {
+        if (this.orientation === Orientation.PORTRAIT && this.ctx != null) {
             this.ctx.beginPath();
             this.ctx.rect(rect.left + rect.pageWidth, rect.top, rect.width, rect.height);
             this.ctx.clip();
         }
     }
     drawBookShadow() {
+        if (this.ctx == null) {
+            console.log('CanvasRender drawBookShadow ctx is null');
+            return;
+        }
         const rect = this.getRect();
         this.ctx.save();
         this.ctx.beginPath();
@@ -64,6 +68,10 @@ export class CanvasRender extends Render {
         this.ctx.restore();
     }
     drawOuterShadow() {
+        if (this.ctx == null) {
+            console.log('CanvasRender drawOuterShadow ctx is null');
+            return;
+        }
         const rect = this.getRect();
         this.ctx.save();
         this.ctx.beginPath();
@@ -88,6 +96,10 @@ export class CanvasRender extends Render {
         this.ctx.restore();
     }
     drawInnerShadow() {
+        if (this.ctx == null) {
+            console.log('CanvasRender drawInnerShadow ctx is null');
+            return;
+        }
         const rect = this.getRect();
         this.ctx.save();
         this.ctx.beginPath();
@@ -121,6 +133,10 @@ export class CanvasRender extends Render {
         this.ctx.restore();
     }
     clear() {
+        if (this.ctx == null) {
+            console.log('CanvasRender clear ctx is null');
+            return;
+        }
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }

@@ -2628,6 +2628,7 @@ class EventObject {
     }
 }
 
+// import './Style/stPageFlip.css';
 /**
  * Class representing a main PageFlip object
  *

@@ -8,7 +8,6 @@ import { Page } from './Page/Page';
 import { EventObject } from './Event/EventObject';
 import type { FlipSetting } from './Settings';
 import { UI } from './UI/UI';
-import './Style/stPageFlip.css';
 /**
  * Class representing a main PageFlip object
  *

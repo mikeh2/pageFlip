@@ -17,7 +17,7 @@ import type { FlipSetting} from './Settings';
 import { Settings, ClickFlipType } from './Settings';
 import { UI } from './UI/UI';
 
-import './Style/stPageFlip.css';
+// import './Style/stPageFlip.css';
 
 /**
  * Class representing a main PageFlip object

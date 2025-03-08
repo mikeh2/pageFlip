@@ -9,7 +9,7 @@ import { Helper } from './Helper';
 import { EventObject } from './Event/EventObject';
 import { HTMLRender } from './Render/HTMLRender';
 import { Settings } from './Settings';
-import './Style/stPageFlip.css';
+// import './Style/stPageFlip.css';
 /**
  * Class representing a main PageFlip object
  *

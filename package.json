@@ -1,0 +1,29 @@
+{
+  "name": "@mikeh/pageflip",
+  "version": "1.0.0",
+  "main": "dist/pf/index.js",
+  "types": "dist/pf/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && mkdir -p dist/pf/Style && cp -r src/pf/Style/stPageFlip.css dist/pf/Style/"
+  },
+  "files": [
+    "/dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/pf/index.js",
+      "types": "./dist/pf/index.d.ts"
+    }, 
+    "./PageFlip": {
+      "import": "./dist/pf/PageFlip.js",
+      "types": "./dist/pf/PageFlip.d.ts"
+    }
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "rollup": "^4.34.9",
+    "typescript": "^5.8.2"
+  }
+}

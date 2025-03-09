@@ -1,8 +1,9 @@
-import { PageFlip } from '../PageFlip';
-import { Point } from '../BasicTypes';
-import { FlipSetting, SizeType } from '../Settings';
-import { FlipCorner, FlippingState } from '../Flip/Flip';
-import { Orientation } from '../Render/Render';
+import type { Point } from '../BasicTypes';
+import { FlipCorner, FlippingState } from '../BasicTypes';
+import { Orientation } from '../Settings';
+import { ClickFlipType} from '../Settings';
+import { IUI, IApp } from '../BasicInterfaces';
+// import { PageFlip } from '../PageFlip';
 
 type SwipeData = {
     point: Point;
@@ -12,14 +13,14 @@ type SwipeData = {
 /**
  * UI Class, represents work with DOM
  */
-export abstract class UI {
+export abstract class UI implements IUI {
     protected readonly parentElement: HTMLElement;
 
-    protected readonly app: PageFlip;
+    protected readonly app: IApp;
     protected readonly wrapper: HTMLElement;
     protected distElement: HTMLElement;
 
-    private touchPoint: SwipeData = null;
+    private touchPoint: SwipeData | null = null;
     private readonly swipeTimeout = 250;
     private readonly swipeDistance: number;
 
@@ -32,46 +33,39 @@ export abstract class UI {
      *
      * @param {HTMLElement} inBlock - Root HTML Element
      * @param {PageFlip} app - PageFlip instanse
-     * @param {FlipSetting} setting - Configuration object
      */
-    protected constructor(inBlock: HTMLElement, app: PageFlip, setting: FlipSetting) {
+    protected constructor(inBlock: HTMLElement, app: IApp) {
         this.parentElement = inBlock;
 
         inBlock.classList.add('stf__parent');
         // Add first wrapper
         inBlock.insertAdjacentHTML('afterbegin', '<div class="stf__wrapper"></div>');
 
-        this.wrapper = inBlock.querySelector('.stf__wrapper');
+        let ele:HTMLElement | null = inBlock.querySelector('.stf__wrapper');
+        if (ele === null) {
+            throw new Error('Element not found');
+        }
+        this.wrapper = ele
+        this.distElement = ele;
 
         this.app = app;
-
-        const k = this.app.getSettings().usePortrait ? 1 : 2;
-
-        // Setting block sizes based on configuration
-        inBlock.style.minWidth = setting.minWidth * k + 'px';
-        inBlock.style.minHeight = setting.minHeight + 'px';
-
-        if (setting.size === SizeType.FIXED) {
-            inBlock.style.minWidth = setting.width * k + 'px';
-            inBlock.style.minHeight = setting.height + 'px';
-        }
-
-        if (setting.autoSize) {
-            inBlock.style.width = '100%';
-            inBlock.style.maxWidth = setting.maxWidth * 2 + 'px';
-        }
-
+        inBlock.style.minWidth = this.app.getSettings().width + 'px';
+        inBlock.style.minHeight = this.app.getSettings().height + 'px';
+        inBlock.style.maxWidth = this.app.getSettings().width + 'px';
+        inBlock.style.maxHeight = this.app.getSettings().height + 'px';
         inBlock.style.display = 'block';
 
         window.addEventListener('resize', this.onResize, false);
-        this.swipeDistance = setting.swipeDistance;
+        this.swipeDistance = this.app.getSettings().swipeDistance;
     }
 
     /**
      * Destructor. Remove all HTML elements and all event handlers
      */
     public destroy(): void {
-        if (this.app.getSettings().useMouseEvents) this.removeHandlers();
+
+        // if (this.app.getSettings().useMouseEvents) this.removeHandlers();
+        this.removeHandlers();
 
         this.distElement.remove();
         this.wrapper.remove();
@@ -81,6 +75,7 @@ export abstract class UI {
      * Updating child components when resizing
      */
     public abstract update(): void;
+    public abstract clear(): void;
 
     /**
      * Get parent element for book
@@ -109,24 +104,14 @@ export abstract class UI {
         this.wrapper.classList.remove('--portrait', '--landscape');
 
         if (orientation === Orientation.PORTRAIT) {
-            if (this.app.getSettings().autoSize)
-                this.wrapper.style.paddingBottom =
-                    (this.app.getSettings().height / this.app.getSettings().width) * 100 + '%';
-
             this.wrapper.classList.add('--portrait');
-        } else {
-            if (this.app.getSettings().autoSize)
-                this.wrapper.style.paddingBottom =
-                    (this.app.getSettings().height / (this.app.getSettings().width * 2)) * 100 +
-                    '%';
-
+        }else if (orientation === Orientation.LANDSCAPE) {
             this.wrapper.classList.add('--landscape');
         }
-
-        this.update();
+        this.update()
     }
 
-    protected removeHandlers(): void {
+    public removeHandlers(): void {
         window.removeEventListener('resize', this.onResize);
 
         this.distElement.removeEventListener('mousedown', this.onMouseDown);
@@ -137,9 +122,15 @@ export abstract class UI {
         window.removeEventListener('touchend', this.onTouchEnd);
     }
 
-    protected setHandlers(): void {
+    public setHandlers(): void {
         window.addEventListener('resize', this.onResize, false);
-        if (!this.app.getSettings().useMouseEvents) return;
+
+        const clickFlipType = this.app.getSettings().clickFlipType;
+        if (clickFlipType == ClickFlipType.DISABLE_FLIPPING || 
+            clickFlipType == ClickFlipType.ONLY_VIA_API) {
+                return
+        }
+        // if (!this.app.getSettings().useMouseEvents) return;
 
         this.distElement.addEventListener('mousedown', this.onMouseDown);
         this.distElement.addEventListener('touchstart', this.onTouchStart);
@@ -166,10 +157,11 @@ export abstract class UI {
         };
     }
 
-    private checkTarget(targer: EventTarget): boolean {
+    private checkTarget(targer: EventTarget | null): boolean {
+
         if (!this.app.getSettings().clickEventForward) return true;
 
-        if (['a', 'button'].includes((targer as HTMLElement).tagName.toLowerCase())) {
+        if (['a', 'button', 'input'].includes((targer as HTMLElement).tagName.toLowerCase())) {
             return false;
         }
 
@@ -177,6 +169,7 @@ export abstract class UI {
     }
 
     private onMouseDown = (e: MouseEvent): void => {
+        // on the book
         if (this.checkTarget(e.target)) {
             const pos = this.getMousePos(e.clientX, e.clientY);
 
@@ -186,6 +179,7 @@ export abstract class UI {
         }
     };
 
+    // on the book element
     private onTouchStart = (e: TouchEvent): void => {
         if (this.checkTarget(e.target)) {
             if (e.changedTouches.length > 0) {

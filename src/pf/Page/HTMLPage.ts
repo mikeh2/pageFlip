@@ -1,36 +1,42 @@
-import { Page, PageDensity, PageOrientation } from './Page';
-import { Render } from '../Render/Render';
+import { Page } from './Page';
+import { PageDensity, PageOrientation } from '../BasicTypes';
+// import { Render } from '../Render/Render';
 import { Helper } from '../Helper';
-import { FlipDirection } from '../Flip/Flip';
-import { Point } from '../BasicTypes';
+import { FlipDirection } from '../BasicTypes';
+import type { Point } from '../BasicTypes';
+import type { IRender } from '../BasicInterfaces';
 
 /**
  * Class representing a book page as a HTML Element
  */
 export class HTMLPage extends Page {
     private readonly element: HTMLElement;
-    private copiedElement: HTMLElement = null;
 
-    private temporaryCopy: Page = null;
+    private copiedElement: HTMLElement | null = null;
+    private temporaryCopy: Page | null = null;
 
     private isLoad = false;
 
-    constructor(render: Render, element: HTMLElement, density: PageDensity) {
+    constructor(render: IRender, element: HTMLElement, density: PageDensity) {
         super(render, density);
 
         this.element = element;
         this.element.classList.add('stf__item');
-        this.element.classList.add('--' + density);
+        this.element.classList.add('__' + density);
     }
 
     public newTemporaryCopy(): Page {
         if (this.nowDrawingDensity === PageDensity.HARD) {
             return this;
         }
+        let parent = this.element.parentElement;
+        if (parent === null) {
+            throw new Error('Element not found');
+        }
 
         if (this.temporaryCopy === null) {
             this.copiedElement = this.element.cloneNode(true) as HTMLElement;
-            this.element.parentElement.appendChild(this.copiedElement);
+            parent.appendChild(this.copiedElement);
 
             this.temporaryCopy = new HTMLPage(
                 this.render,
@@ -39,29 +45,36 @@ export class HTMLPage extends Page {
             );
         }
 
-        return this.getTemporaryCopy();
+        let temp = this.getTemporaryCopy(); 
+        if (temp === null) {
+            console.error('unable create temp');
+            return this
+        }
+        return temp; 
     }
 
-    public getTemporaryCopy(): Page {
+    public getTemporaryCopy(): Page | null {
         return this.temporaryCopy;
     }
 
     public hideTemporaryCopy(): void {
         if (this.temporaryCopy !== null) {
-            this.copiedElement.remove();
+            if (this.copiedElement !== null) {
+                this.copiedElement.remove();
+            }
             this.copiedElement = null;
             this.temporaryCopy = null;
         }
     }
 
-    public draw(tempDensity?: PageDensity): void {
+    public draw(tempDensity: PageDensity | null): void {
         const density = tempDensity ? tempDensity : this.nowDrawingDensity;
 
         const pagePos = this.render.convertToGlobal(this.state.position);
         const pageWidth = this.render.getRect().pageWidth;
         const pageHeight = this.render.getRect().height;
 
-        this.element.classList.remove('--simple');
+        this.element.classList.remove('__simple');
 
         const commonStyle = `
             display: block;
@@ -141,7 +154,7 @@ export class HTMLPage extends Page {
 
         const y = rect.top;
 
-        this.element.classList.add('--simple');
+        this.element.classList.add('__simple');
         this.element.style.cssText = `
             position: absolute; 
             display: block; 
@@ -162,14 +175,13 @@ export class HTMLPage extends Page {
 
     public setOrientation(orientation: PageOrientation): void {
         super.setOrientation(orientation);
-        this.element.classList.remove('--left', '--right');
-
-        this.element.classList.add(orientation === PageOrientation.RIGHT ? '--right' : '--left');
+        this.element.classList.remove('__left', '__right');
+        this.element.classList.add(orientation === PageOrientation.RIGHT ? '__right' : '__left');
     }
 
     public setDrawingDensity(density: PageDensity): void {
-        this.element.classList.remove('--soft', '--hard');
-        this.element.classList.add('--' + density);
+        this.element.classList.remove('__soft', '__hard');
+        this.element.classList.add('__' + density);
 
         super.setDrawingDensity(density);
     }

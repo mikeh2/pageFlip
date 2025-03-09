@@ -1,22 +1,27 @@
 import { Helper } from '../Helper';
-import { Point, Rect, RectPoints, Segment } from '../BasicTypes';
-import { FlipCorner, FlipDirection } from './Flip';
+import type { Point, Rect, RectPoints, Segment } from '../BasicTypes';
+import { FlipCorner, FlipDirection } from '../BasicTypes';
 
 /**
  * Class representing mathematical methods for calculating page position (rotation angle, clip area ...)
  */
 export class FlipCalculation {
     /** Calculated rotation angle to flipping page */
-    private angle: number;
+    private angle: number = 0;
     /** Calculated position to flipping page */
-    private position: Point;
+    private position: Point = { x: 0, y: 0 };
 
-    private rect: RectPoints;
+    private rect: RectPoints = {
+        topLeft: { x: 0, y: 0 },
+        topRight: { x: 0, y: 0 },
+        bottomLeft: { x: 0, y: 0 },
+        bottomRight: { x: 0, y: 0 },
+    };
 
     /** The point of intersection of the page with the borders of the book */
-    private topIntersectPoint: Point = null; // With top border
-    private sideIntersectPoint: Point = null; // With side border
-    private bottomIntersectPoint: Point = null; // With bottom border
+    private topIntersectPoint: Point | null = null; // With top border
+    private sideIntersectPoint: Point | null = null; // With side border
+    private bottomIntersectPoint: Point | null = null; // With bottom border
 
     private readonly pageWidth: number;
     private readonly pageHeight: number;
@@ -65,8 +70,10 @@ export class FlipCalculation {
      * 
      * @returns {Point[]} Polygon page
      */
-    public getFlippingClipArea(): Point[] {
-        const result = [];
+    public getFlippingClipArea(): (Point|null) [] {
+
+        const result:(Point|null) [] = [];
+
         let clipBottom = false;
 
         result.push(this.rect.topLeft);
@@ -94,8 +101,9 @@ export class FlipCalculation {
      * 
      * @returns {Point[]} Polygon page
      */
-    public getBottomClipArea(): Point[] {
-        const result = [];
+    public getBottomClipArea(): (Point|null)[] {
+
+        const result:(Point|null) [] = [];
 
         result.push(this.topIntersectPoint);
 
@@ -199,7 +207,7 @@ export class FlipCalculation {
     /**
      * Get the starting position of the shadow
      */
-    public getShadowStartPoint(): Point {
+    public getShadowStartPoint(): Point | null {
         if (this.corner === FlipCorner.TOP) {
             return this.topIntersectPoint;
         } else {
@@ -213,7 +221,9 @@ export class FlipCalculation {
      * Get the rotate angle of the shadow
      */
     public getShadowAngle(): number {
-        const angle = Helper.GetAngleBetweenTwoLine(this.getSegmentToShadowLine(), [
+        let segment = this.getSegmentToShadowLine();
+        if (segment === null) return 0;
+        const angle = Helper.GetAngleBetweenTwoLine(segment, [
             { x: 0, y: 0 },
             { x: this.pageWidth, y: 0 },
         ]);
@@ -420,7 +430,8 @@ export class FlipCalculation {
         return result;
     }
 
-    private getSegmentToShadowLine(): Segment {
+    private getSegmentToShadowLine(): Segment | null {
+
         const first = this.getShadowStartPoint();
 
         const second =
@@ -428,6 +439,7 @@ export class FlipCalculation {
                 ? this.sideIntersectPoint
                 : this.bottomIntersectPoint;
 
+        if (first === null || second === null) return null
         return [first, second];
     }
 }

@@ -1,8 +1,9 @@
 import { HTMLPage } from '../Page/HTMLPage';
-import { Render } from '../Render/Render';
 import { PageCollection } from './PageCollection';
-import { PageFlip } from '../PageFlip';
-import { PageDensity } from '../Page/Page';
+import { PageDensity } from '../BasicTypes';
+// import { Render } from '../Render/Render';
+// import { PageFlip } from '../PageFlip';
+import type {IApp, IRender} from '../BasicInterfaces';
 
 /**
  * Сlass representing a collection of pages as HTML Element
@@ -12,8 +13,8 @@ export class HTMLPageCollection extends PageCollection {
     private readonly pagesElement: NodeListOf<HTMLElement> | HTMLElement[];
 
     constructor(
-        app: PageFlip,
-        render: Render,
+        app: IApp,
+        render: IRender,
         element: HTMLElement,
         items: NodeListOf<HTMLElement> | HTMLElement[]
     ) {

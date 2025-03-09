@@ -1,57 +1,27 @@
-import { Render } from '../Render/Render';
-import { Point } from '../BasicTypes';
-
-/**
- * State of the page on the basis of which rendering
- */
-export interface PageState {
-    /** Page rotation angle */
-    angle: number;
-
-    /** Page scope */
-    area: Point[];
-
-    /** Page position */
-    position: Point;
-
-    /** Rotate angle for hard pages */
-    hardAngle: number;
-
-    /** Rotate angle for hard pages at renedering time */
-    hardDrawingAngle: number;
-}
-
-export const enum PageOrientation {
-    /** Left side page */
-    LEFT,
-
-    /** Right side page */
-    RIGHT,
-}
-
-export const enum PageDensity {
-    SOFT = 'soft',
-    HARD = 'hard',
-}
+// import { Render } from '../Render/Render';
+import { PageDensity, PageOrientation} from '../BasicTypes';
+import type { PageState, Point} from '../BasicTypes';
+import type {IPage} from '../BasicInterfaces';
+import type {IRender} from '../BasicInterfaces';
 
 /**
  * Class representing a book page
  */
-export abstract class Page {
+export abstract class Page implements IPage {
     /** State of the page on the basis of which rendering */
     protected state: PageState;
     /** Render object */
-    protected render: Render;
+    protected render: IRender;
 
     /** Page Orientation */
-    protected orientation: PageOrientation;
+    protected orientation: PageOrientation = PageOrientation.RIGHT;
 
     /** Density at creation */
     protected createdDensity: PageDensity;
     /** Density at the time of rendering (Depends on neighboring pages) */
     protected nowDrawingDensity: PageDensity;
 
-    protected constructor(render: Render, density: PageDensity) {
+    protected constructor(render: IRender, density: PageDensity) {
         this.state = {
             angle: 0,
             area: [],
@@ -78,7 +48,7 @@ export abstract class Page {
      * 
      * @param {PageDensity} tempDensity - Density at the time of rendering 
      */
-    public abstract draw(tempDensity?: PageDensity): void;
+    public abstract draw(tempDensity: PageDensity | null): void;
 
     /**
      * Page loading
@@ -181,6 +151,6 @@ export abstract class Page {
     }
 
     public abstract newTemporaryCopy(): Page;
-    public abstract getTemporaryCopy(): Page;
+    public abstract getTemporaryCopy(): Page | null;
     public abstract hideTemporaryCopy(): void;
 }

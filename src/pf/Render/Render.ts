@@ -1,8 +1,11 @@
-import { PageFlip } from '../PageFlip';
-import { Point, PageRect, RectPoints } from '../BasicTypes';
-import { FlipDirection } from '../Flip/Flip';
-import { Page, PageOrientation } from '../Page/Page';
-import { FlipSetting, SizeType } from '../Settings';
+import type { Point, PageRect, RectPoints } from '../BasicTypes';
+import { FlipDirection } from '../BasicTypes';
+// import { Page } from '../Page/Page';
+// import { PageFlip } from '../PageFlip';
+import { PageOrientation } from '../BasicTypes';
+import { Orientation, type FlipSetting} from '../Settings';
+
+import type { IApp, IRender, IPage } from '../BasicInterfaces';
 
 type FrameAction = () => void;
 type AnimationSuccessAction = () => void;
@@ -24,6 +27,14 @@ type Shadow = {
     /** Flipping progress in percent (0 - 100) */
     progress: number;
 };
+const emptyShadow: Shadow = {
+    pos: { x: 0, y: 0 },
+    angle: 0,
+    width: 0,
+    opacity: 0,
+    direction: FlipDirection.FORWARD,
+    progress: 100,
+};
 
 /**
  * Type describing the animation process
@@ -43,42 +54,33 @@ type AnimationProcess = {
 };
 
 /**
- * Book orientation
- */
-export const enum Orientation {
-    PORTRAIT = 'portrait',
-    LANDSCAPE = 'landscape',
-}
-
-/**
  * Class responsible for rendering the book
  */
-export abstract class Render {
-    protected readonly setting: FlipSetting;
-    protected readonly app: PageFlip;
+export abstract class Render implements IRender {
+    protected readonly app: IApp;
 
     /** Left static book page */
-    protected leftPage: Page = null;
+    protected leftPage: IPage | null = null;
     /** Right static book page */
-    protected rightPage: Page = null;
+    protected rightPage: IPage | null = null;
 
     /** Page currently flipping */
-    protected flippingPage: Page = null;
+    protected flippingPage: IPage | null = null;
     /** Next page at the time of flipping */
-    protected bottomPage: Page = null;
+    protected bottomPage: IPage  | null= null;
 
     /** Current flipping direction */
-    protected direction: FlipDirection = null;
+    protected direction: FlipDirection = FlipDirection.FORWARD;
     /** Current book orientation */
-    protected orientation: Orientation = null;
+    protected orientation: Orientation = Orientation.LANDSCAPE;
     /** Сurrent state of the shadows */
-    protected shadow: Shadow = null;
+    protected shadow: Shadow = emptyShadow;
     /** Сurrent animation process */
-    protected animation: AnimationProcess = null;
+    protected animation: AnimationProcess  | null= null;
     /** Page borders while flipping */
-    protected pageRect: RectPoints = null;
+    protected pageRect: RectPoints  = { topLeft: { x: 0, y: 0 }, topRight: { x: 0, y: 0 }, bottomLeft: { x: 0, y: 0 }, bottomRight: { x: 0, y: 0 } };
     /** Current book area */
-    private boundsRect: PageRect = null;
+    private boundsRect: PageRect = { pageWidth: 0, width: 0, height: 0, top: 0, left: 0 };
 
     /** Timer started from start of rendering */
     protected timer = 0;
@@ -90,8 +92,7 @@ export abstract class Render {
      */
     private safari = false;
 
-    protected constructor(app: PageFlip, setting: FlipSetting) {
-        this.setting = setting;
+    protected constructor(app: IApp) {
         this.app = app;
 
         // detect safari
@@ -189,7 +190,6 @@ export abstract class Render {
      * Recalculate the size of the displayed area, and update the page orientation
      */
     public update(): void {
-        this.boundsRect = null;
         const orientation = this.calculateBoundsRect();
 
         if (this.orientation !== orientation) {
@@ -202,57 +202,42 @@ export abstract class Render {
      * Calculate the size and position of the book depending on the parent element and configuration parameters
      */
     private calculateBoundsRect(): Orientation {
-        let orientation = Orientation.LANDSCAPE;
 
+        // parent element (stf__block)
+        let wrapper = this.app.getUI().getDistElement();
         const blockWidth = this.getBlockWidth();
+        const blockHeight = this.getBlockHeight();
         const middlePoint: Point = {
             x: blockWidth / 2,
-            y: this.getBlockHeight() / 2,
+            y: blockHeight / 2,
         };
+        // effect-wise, a 0 margin is best
+        let margin = 0;
+        let w = this.app.getSettings().width;
+        let h = this.app.getSettings().height;
 
-        const ratio = this.setting.width / this.setting.height;
+        // portrait mode
+        // this is needed for offscreen rendering
+        let canvas_width = w * 2;
 
-        let pageWidth = this.setting.width;
-        let pageHeight = this.setting.height;
+        let orientation = this.app.getSettings().orientation; 
+        let pw = w - margin*2;
+        let ph = h - margin*2;
+        let left = -w + margin*2; 
 
-        let left = middlePoint.x - pageWidth;
-
-        if (this.setting.size === SizeType.STRETCH) {
-            if (blockWidth < this.setting.minWidth * 2 && this.app.getSettings().usePortrait)
-                orientation = Orientation.PORTRAIT;
-
-            pageWidth =
-                orientation === Orientation.PORTRAIT
-                    ? this.getBlockWidth()
-                    : this.getBlockWidth() / 2;
-
-            if (pageWidth > this.setting.maxWidth) pageWidth = this.setting.maxWidth;
-
-            pageHeight = pageWidth / ratio;
-            if (pageHeight > this.getBlockHeight()) {
-                pageHeight = this.getBlockHeight();
-                pageWidth = pageHeight * ratio;
-            }
-
-            left =
-                orientation === Orientation.PORTRAIT
-                    ? middlePoint.x - pageWidth / 2 - pageWidth
-                    : middlePoint.x - pageWidth;
-        } else {
-            if (blockWidth < pageWidth * 2) {
-                if (this.app.getSettings().usePortrait) {
-                    orientation = Orientation.PORTRAIT;
-                    left = middlePoint.x - pageWidth / 2 - pageWidth;
-                }
-            }
+        if (orientation === Orientation.LANDSCAPE) {
+            pw = w/2 - margin*2;
+            left = margin*2 
+            canvas_width = w;
+        }else{  
+            left = middlePoint.x - pw / 2 - pw
         }
-
         this.boundsRect = {
-            left,
-            top: middlePoint.y - pageHeight / 2,
-            width: pageWidth * 2,
-            height: pageHeight,
-            pageWidth: pageWidth,
+            left:left,
+            top: margin,
+            width: canvas_width,
+            height:h-margin*2,
+            pageWidth: pw,
         };
 
         return orientation;
@@ -290,21 +275,25 @@ export abstract class Render {
      * Clear shadow
      */
     public clearShadow(): void {
-        this.shadow = null;
+        this.shadow = emptyShadow;
     }
 
     /**
      * Get parent block offset width
      */
     public getBlockWidth(): number {
-        return this.app.getUI().getDistElement().offsetWidth;
+        let ele:HTMLElement | null = this.app.getUI().getDistElement();
+        if (ele === null) return 0;
+        return ele.offsetWidth;
     }
 
     /**
      * Get parent block offset height
      */
     public getBlockHeight(): number {
-        return this.app.getUI().getDistElement().offsetHeight;
+        let ele:HTMLElement | null = this.app.getUI().getDistElement();
+        if (ele === null) return 0;
+        return ele.offsetHeight;
     }
 
     /**
@@ -318,8 +307,14 @@ export abstract class Render {
      * Сurrent size and position of the book
      */
     public getRect(): PageRect {
-        if (this.boundsRect === null) this.calculateBoundsRect();
 
+        if (this.boundsRect === null) {
+           // side effect of calculating boundsRect
+           let orientation = this.calculateBoundsRect();
+        } 
+        if (this.boundsRect === null) {
+            return { pageWidth: 0, width: 0, height: 0, top: 0, left: 0 };
+        }
         return this.boundsRect;
     }
 
@@ -360,7 +355,7 @@ export abstract class Render {
      *
      * @param page
      */
-    public setRightPage(page: Page): void {
+    public setRightPage(page: IPage): void {
         if (page !== null) page.setOrientation(PageOrientation.RIGHT);
 
         this.rightPage = page;
@@ -370,7 +365,7 @@ export abstract class Render {
      * Set left static book page
      * @param page
      */
-    public setLeftPage(page: Page): void {
+    public setLeftPage(page: IPage): void {
         if (page !== null) page.setOrientation(PageOrientation.LEFT);
 
         this.leftPage = page;
@@ -380,7 +375,7 @@ export abstract class Render {
      * Set next page at the time of flipping
      * @param page
      */
-    public setBottomPage(page: Page): void {
+    public setBottomPage(page: IPage): void {
         if (page !== null)
             page.setOrientation(
                 this.direction === FlipDirection.BACK ? PageOrientation.LEFT : PageOrientation.RIGHT
@@ -394,7 +389,7 @@ export abstract class Render {
      *
      * @param page
      */
-    public setFlippingPage(page: Page): void {
+    public setFlippingPage(page: IPage): void {
         if (page !== null)
             page.setOrientation(
                 this.direction === FlipDirection.FORWARD &&
@@ -434,7 +429,10 @@ export abstract class Render {
      * @returns {Point} Coordinates relative to the work page
      */
     public convertToPage(pos: Point, direction?: FlipDirection): Point {
-        if (!direction) direction = this.direction;
+
+        if (!direction || direction == null) {
+            direction = this.direction;
+        }
 
         const rect = this.getRect();
         const x =
@@ -459,7 +457,7 @@ export abstract class Render {
     public convertToGlobal(pos: Point, direction?: FlipDirection): Point {
         if (!direction) direction = this.direction;
 
-        if (pos == null) return null;
+        if (pos == null) return pos;
 
         const rect = this.getRect();
 

@@ -1,7 +1,10 @@
-import { Orientation, Render } from '../Render/Render';
-import { Page, PageDensity } from '../Page/Page';
-import { PageFlip } from '../PageFlip';
-import { FlipDirection } from '../Flip/Flip';
+import { Orientation } from '../Settings';
+import { PageDensity } from '../BasicTypes';
+import { FlipDirection } from '../BasicTypes';
+// import { PageFlip } from '../PageFlip';
+//import { Page } from '../Page/Page';
+//import { Render } from '../Render/Render';
+import {IPage, IRender, IApp} from '../BasicInterfaces';
 
 type NumberArray = number[];
 
@@ -9,12 +12,12 @@ type NumberArray = number[];
  * Сlass representing a collection of pages
  */
 export abstract class PageCollection {
-    protected readonly app: PageFlip;
-    protected readonly render: Render;
+    protected readonly app: IApp;
+    protected readonly render: IRender;
     protected readonly isShowCover: boolean;
 
     /** Pages List */
-    protected pages: Page[] = [];
+    protected pages: IPage[] = [];
     /** Index of the current page in list */
     protected currentPageIndex = 0;
 
@@ -25,7 +28,7 @@ export abstract class PageCollection {
     /**  One-page spread in portrait mode */
     protected portraitSpread: NumberArray[] = [];
 
-    protected constructor(app: PageFlip, render: Render) {
+    protected constructor(app: IApp, render: IRender) {
         this.render = render;
         this.app = app;
 
@@ -92,7 +95,7 @@ export abstract class PageCollection {
         for (let i = 0; i < spread.length; i++)
             if (pageNum === spread[i][0] || pageNum === spread[i][1]) return i;
 
-        return null;
+        return -1;
     }
 
     /**
@@ -105,7 +108,7 @@ export abstract class PageCollection {
     /**
      * Get the pages list
      */
-    public getPages(): Page[] {
+    public getPages(): IPage[] {
         return this.pages;
     }
 
@@ -114,12 +117,12 @@ export abstract class PageCollection {
      *
      * @param {number} pageIndex
      */
-    public getPage(pageIndex: number): Page {
+    public getPage(pageIndex: number): IPage | null {
         if (pageIndex >= 0 && pageIndex < this.pages.length) {
             return this.pages[pageIndex];
         }
-
-        throw new Error('Invalid page number');
+        console.error('Invalid page number');
+        return null;
     }
 
     /**
@@ -127,7 +130,7 @@ export abstract class PageCollection {
      *
      * @param {Page} current
      */
-    public nextBy(current: Page): Page {
+    public nextBy(current: IPage): IPage | null {
         const idx = this.pages.indexOf(current);
 
         if (idx < this.pages.length - 1) return this.pages[idx + 1];
@@ -140,7 +143,7 @@ export abstract class PageCollection {
      *
      * @param {Page} current
      */
-    public prevBy(current: Page): Page {
+    public prevBy(current: IPage): IPage | null {
         const idx = this.pages.indexOf(current);
 
         if (idx > 0) return this.pages[idx - 1];
@@ -153,7 +156,7 @@ export abstract class PageCollection {
      *
      * @param {FlipDirection} direction
      */
-    public getFlippingPage(direction: FlipDirection): Page {
+    public getFlippingPage(direction: FlipDirection): IPage {
         const current = this.currentSpreadIndex;
 
         if (this.render.getOrientation() === Orientation.PORTRAIT) {
@@ -179,7 +182,7 @@ export abstract class PageCollection {
      *
      * @param {FlipDirection}  direction
      */
-    public getBottomPage(direction: FlipDirection): Page {
+    public getBottomPage(direction: FlipDirection): IPage {
         const current = this.currentSpreadIndex;
 
         if (this.render.getOrientation() === Orientation.PORTRAIT) {
@@ -231,13 +234,13 @@ export abstract class PageCollection {
      * Show specified page
      * @param {number} pageNum - Page index (from 0s)
      */
-    public show(pageNum: number = null): void {
+    public show(pageNum: number | null = null): void {
         if (pageNum === null) pageNum = this.currentPageIndex;
 
         if (pageNum < 0 || pageNum >= this.pages.length) return;
 
         const spreadIndex = this.getSpreadIndexByPage(pageNum);
-        if (spreadIndex !== null) {
+        if (spreadIndex !== -1) {
             this.currentSpreadIndex = spreadIndex;
             this.showSpread();
         }
@@ -290,4 +293,16 @@ export abstract class PageCollection {
         this.currentPageIndex = spread[0];
         this.app.updatePageIndex(this.currentPageIndex);
     }
+}
+
+export class EmptyColletion extends PageCollection
+{
+    constructor(app: IApp, render: IRender) {
+        super(app, render);
+    }
+    public load(): void {}
+    public destroy(): void {}
+    public getSpreadIndexByPage(pageNum: number): number { return 0; }
+    public getPageCount(): number { return 0; }
+    public getPages(): IPage[] { return []; }       
 }

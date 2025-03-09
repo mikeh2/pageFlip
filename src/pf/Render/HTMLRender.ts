@@ -1,10 +1,13 @@
-import { Orientation, Render } from './Render';
-import { PageFlip } from '../PageFlip';
-import { FlipDirection } from '../Flip/Flip';
-import { PageDensity, PageOrientation } from '../Page/Page';
+import { Orientation } from '../Settings';
+import { FlipDirection } from '../BasicTypes';
+import { PageDensity, PageOrientation } from '../BasicTypes';
 import { HTMLPage } from '../Page/HTMLPage';
 import { Helper } from '../Helper';
-import { FlipSetting } from '../Settings';
+import type { FlipSetting } from '../Settings';
+import { Render } from './Render';
+// import { PageFlip } from '../PageFlip';
+import type { IApp, IRender } from '../BasicInterfaces';
+
 
 /**
  * Class responsible for rendering the HTML book
@@ -14,22 +17,22 @@ export class HTMLRender extends Render {
     private readonly element: HTMLElement;
 
     /** Pages List as HTMLElements */
-    private readonly items: NodeListOf<HTMLElement> | HTMLElement[];
+    // private readonly items: NodeListOf<HTMLElement> | HTMLElement[];
 
-    private outerShadow: HTMLElement = null;
-    private innerShadow: HTMLElement = null;
-    private hardShadow: HTMLElement = null;
-    private hardInnerShadow: HTMLElement = null;
+    private outerShadow: HTMLElement | null = null;
+    private innerShadow: HTMLElement  | null= null;
+    private hardShadow: HTMLElement  | null= null;
+    private hardInnerShadow: HTMLElement | null = null;
 
     /**
      * @constructor
      *
-     * @param {PageFlip} app - PageFlip object
+     * @param {IApp} app - PageFlip object
      * @param {FlipSetting} setting - Configuration object
      * @param {HTMLElement} element - Parent HTML Element
      */
-    constructor(app: PageFlip, setting: FlipSetting, element: HTMLElement) {
-        super(app, setting);
+    constructor(app: IApp, element: HTMLElement) {
+        super(app);
 
         this.element = element;
 
@@ -54,10 +57,18 @@ export class HTMLRender extends Render {
     public clearShadow(): void {
         super.clearShadow();
 
-        this.outerShadow.style.cssText = 'display: none';
-        this.innerShadow.style.cssText = 'display: none';
-        this.hardShadow.style.cssText = 'display: none';
-        this.hardInnerShadow.style.cssText = 'display: none';
+        if (this.outerShadow !== null) {
+            this.outerShadow.style.cssText = 'display: none';
+        }
+        if (this.innerShadow !== null) {
+            this.innerShadow.style.cssText = 'display: none';
+        }
+        if (this.hardShadow !== null) {
+            this.hardShadow.style.cssText = 'display: none';
+        }
+        if (this.hardInnerShadow !== null) {
+            this.hardInnerShadow.style.cssText = 'display: none';
+        }
     }
 
     public reload(): void {
@@ -98,7 +109,9 @@ export class HTMLRender extends Render {
                 ? `transform: translate3d(0, 0, 0);`
                 : `transform: translate3d(0, 0, 0) rotateY(180deg);`;
 
-        this.hardInnerShadow.style.cssText = newStyle;
+        if (this.hardInnerShadow !== null) {
+            this.hardInnerShadow.style.cssText = newStyle;
+        }
     }
 
     /**
@@ -131,7 +144,9 @@ export class HTMLRender extends Render {
                 ? `transform: translate3d(0, 0, 0) rotateY(180deg);`
                 : `transform: translate3d(0, 0, 0);`;
 
-        this.hardShadow.style.cssText = newStyle;
+        if (this.hardShadow !== null) {
+            this.hardShadow.style.cssText = newStyle;
+        }
     }
 
     /**
@@ -195,7 +210,9 @@ export class HTMLRender extends Render {
             -webkit-clip-path: ${polygon};
         `;
 
-        this.innerShadow.style.cssText = newStyle;
+        if (this.innerShadow !== null) {
+            this.innerShadow.style.cssText = newStyle;
+        }
     }
 
     /**
@@ -258,7 +275,9 @@ export class HTMLRender extends Render {
             -webkit-clip-path: ${polygon};
         `;
 
-        this.outerShadow.style.cssText = newStyle;
+        if (this.outerShadow !== null) {
+            this.outerShadow.style.cssText = newStyle;
+        }
     }
 
     /**
@@ -288,6 +307,8 @@ export class HTMLRender extends Render {
      */
     private drawRightPage(): void {
         if (this.rightPage === null) return;
+
+        // PORTRAIT is always the right page
 
         if (
             this.direction === FlipDirection.FORWARD &&
@@ -337,7 +358,7 @@ export class HTMLRender extends Render {
                 this.getSettings().startZIndex + 5
             ).toString(10);
 
-            this.flippingPage.draw();
+            this.flippingPage.draw(null);
         }
 
         if (this.shadow != null && this.flippingPage !== null) {

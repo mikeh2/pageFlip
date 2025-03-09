@@ -1,6 +1,7 @@
 import {UI} from "./UI";
-import {PageFlip} from "../PageFlip";
-import {FlipSetting} from "../Settings";
+// import {PageFlip} from "../PageFlip";
+import type {FlipSetting} from "../Settings";
+import type { IApp } from "../BasicInterfaces";
 
 /**
  * UI for canvas mode
@@ -8,8 +9,8 @@ import {FlipSetting} from "../Settings";
 export class CanvasUI extends UI {
     private readonly canvas: HTMLCanvasElement;
 
-    constructor(inBlock: HTMLElement, app: PageFlip, setting: FlipSetting) {
-        super(inBlock, app, setting);
+    constructor(inBlock: HTMLElement, app: IApp) {
+        super(inBlock, app);
 
         this.wrapper.innerHTML = '<canvas class="stf__canvas"></canvas>';
 
@@ -28,6 +29,14 @@ export class CanvasUI extends UI {
 
         this.canvas.width = width;
         this.canvas.height = height;
+    }
+
+    public clear(): void {
+        const ctx = this.canvas.getContext('2d');
+        if (ctx == null) {
+            return;
+        }
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     /**

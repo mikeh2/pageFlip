@@ -1,24 +1,27 @@
-import { Orientation, Render } from './Render';
-import { PageFlip } from '../PageFlip';
-import { FlipDirection } from '../Flip/Flip';
-import { PageOrientation } from '../Page/Page';
-import { FlipSetting } from '../Settings';
+import { Render } from './Render';
+import { Orientation } from '../Settings';
+import { FlipDirection } from '../BasicTypes';
+import { PageOrientation } from '../BasicTypes';
+import type { FlipSetting } from '../Settings';
+// import { PageFlip } from '../PageFlip';
+import type { IApp } from '../BasicInterfaces';
 
 /**
  * Class responsible for rendering the Canvas book
  */
 export class CanvasRender extends Render {
     private readonly canvas: HTMLCanvasElement;
-    private readonly ctx: CanvasRenderingContext2D;
+    private readonly ctx: CanvasRenderingContext2D | null;
 
-    constructor(app: PageFlip, setting: FlipSetting, inCanvas: HTMLCanvasElement) {
-        super(app, setting);
+    constructor(app: IApp, inCanvas: HTMLCanvasElement) {
+        super(app);
 
         this.canvas = inCanvas;
         this.ctx = inCanvas.getContext('2d');
+        console.log('CanvasRender constructor', this.canvas, this.ctx);
     }
 
-    public getContext(): CanvasRenderingContext2D {
+    public getContext(): CanvasRenderingContext2D | null {
         return this.ctx;
     }
 
@@ -34,11 +37,11 @@ export class CanvasRender extends Render {
 
         if (this.rightPage != null) this.rightPage.simpleDraw(PageOrientation.RIGHT);
 
-        if (this.bottomPage != null) this.bottomPage.draw();
+        if (this.bottomPage != null) this.bottomPage.draw(null);
 
         this.drawBookShadow();
 
-        if (this.flippingPage != null) this.flippingPage.draw();
+        if (this.flippingPage != null) this.flippingPage.draw(null);
 
         if (this.shadow != null) {
             this.drawOuterShadow();
@@ -47,7 +50,7 @@ export class CanvasRender extends Render {
 
         const rect = this.getRect();
 
-        if (this.orientation === Orientation.PORTRAIT) {
+        if (this.orientation === Orientation.PORTRAIT && this.ctx != null) {
             this.ctx.beginPath();
             this.ctx.rect(rect.left + rect.pageWidth, rect.top, rect.width, rect.height);
             this.ctx.clip();
@@ -55,6 +58,10 @@ export class CanvasRender extends Render {
     }
 
     private drawBookShadow(): void {
+        if (this.ctx == null) {
+            console.log('CanvasRender drawBookShadow ctx is null');
+            return;
+        }
         const rect = this.getRect();
 
         this.ctx.save();
@@ -84,6 +91,10 @@ export class CanvasRender extends Render {
     }
 
     private drawOuterShadow(): void {
+        if (this.ctx == null) {
+            console.log('CanvasRender drawOuterShadow ctx is null');
+            return;
+        }
         const rect = this.getRect();
 
         this.ctx.save();
@@ -117,6 +128,10 @@ export class CanvasRender extends Render {
     }
 
     private drawInnerShadow(): void {
+        if (this.ctx == null) {
+            console.log('CanvasRender drawInnerShadow ctx is null');
+            return
+        }
         const rect = this.getRect();
 
         this.ctx.save();
@@ -161,6 +176,10 @@ export class CanvasRender extends Render {
     }
 
     private clear(): void {
+        if (this.ctx == null) {
+            console.log('CanvasRender clear ctx is null');
+            return;
+        }
         this.ctx.fillStyle = 'white';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }

@@ -1,4 +1,5 @@
-import { PageFlip } from '../PageFlip';
+//import { PageFlip } from '../PageFlip';
+import type { IApp } from "../BasicInterfaces";
 
 /**
  * Data type passed to the event handler
@@ -9,8 +10,8 @@ export type DataType = number | string | boolean | object;
  * Type of object in event handlers
  */
 export interface WidgetEvent {
-    data: DataType;
-    object: PageFlip;
+    data: DataType | null;
+    object: IApp;
 }
 
 type EventCallback = (e: WidgetEvent) => void;
@@ -28,10 +29,14 @@ export abstract class EventObject {
      * @param {EventCallback} callback
      */
     public on(eventName: string, callback: EventCallback): EventObject {
+        let eventCallbacks = this.events.get(eventName);
+
         if (!this.events.has(eventName)) {
             this.events.set(eventName, [callback]);
         } else {
-            this.events.get(eventName).push(callback);
+            if (eventCallbacks !== undefined) {
+                eventCallbacks.push(callback);
+            }
         }
 
         return this;
@@ -46,10 +51,13 @@ export abstract class EventObject {
         this.events.delete(event);
     }
 
-    protected trigger(eventName: string, app: PageFlip, data: DataType = null): void {
-        if (!this.events.has(eventName)) return;
+    protected trigger(eventName: string, app: IApp, data: DataType | null = null): void {
 
-        for (const callback of this.events.get(eventName)) {
+        if (!this.events.has(eventName)) return;
+        let eventCallbacks = this.events.get(eventName);
+        if (eventCallbacks === undefined) return
+
+        for (const callback of eventCallbacks) {
             callback({ data, object: app });
         }
     }

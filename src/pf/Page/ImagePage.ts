@@ -1,31 +1,35 @@
 import { CanvasRender } from '../Render/CanvasRender';
-import { Page, PageDensity, PageOrientation } from './Page';
-import { Render } from '../Render/Render';
-import { Point } from '../BasicTypes';
+import { PageDensity, PageOrientation } from '../BasicTypes';
+import type { Point } from '../BasicTypes';
+// import { Render } from '../Render/Render';
+import { Page } from './Page';
+import type { IRender } from '../BasicInterfaces';
 
 /**
  * Class representing a book page as an image on Canvas
  */
 export class ImagePage extends Page {
-    private readonly image: HTMLImageElement = null;
+    private readonly image: HTMLImageElement | null = null;
     private isLoad = false;
 
     private loadingAngle = 0;
 
-    constructor(render: Render, href: string, density: PageDensity) {
+    constructor(render: IRender, href: string, density: PageDensity) {
         super(render, density);
 
         this.image = new Image();
         this.image.src = href;
     }
 
-    public draw(tempDensity?: PageDensity): void {
+    public draw(tempDensity: PageDensity | null): void {
+
         const ctx = (this.render as CanvasRender).getContext();
 
         const pagePos = this.render.convertToGlobal(this.state.position);
         const pageWidth = this.render.getRect().pageWidth;
         const pageHeight = this.render.getRect().height;
 
+        if (!ctx) return
         ctx.save();
         ctx.translate(pagePos.x, pagePos.y);
         ctx.beginPath();
@@ -44,6 +48,7 @@ export class ImagePage extends Page {
         if (!this.isLoad) {
             this.drawLoader(ctx, { x: 0, y: 0 }, pageWidth, pageHeight);
         } else {
+            if (!this.image) return
             ctx.drawImage(this.image, 0, 0, pageWidth, pageHeight);
         }
 
@@ -53,6 +58,7 @@ export class ImagePage extends Page {
     public simpleDraw(orient: PageOrientation): void {
         const rect = this.render.getRect();
         const ctx = (this.render as CanvasRender).getContext();
+        
 
         const pageWidth = rect.pageWidth;
         const pageHeight = rect.height;
@@ -61,9 +67,11 @@ export class ImagePage extends Page {
 
         const y = rect.top;
 
+        if (!ctx) return
         if (!this.isLoad) {
             this.drawLoader(ctx, { x, y }, pageWidth, pageHeight);
         } else {
+            if (!this.image) return
             ctx.drawImage(this.image, x, y, pageWidth, pageHeight);
         }
     }
@@ -106,6 +114,7 @@ export class ImagePage extends Page {
     }
 
     public load(): void {
+        if (!this.image) return
         if (!this.isLoad)
             this.image.onload = (): void => {
                 this.isLoad = true;

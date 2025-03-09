@@ -1,6 +1,7 @@
 import { UI } from './UI';
-import { PageFlip } from '../PageFlip';
-import { FlipSetting } from '../Settings';
+//import { PageFlip } from '../PageFlip';
+import type { FlipSetting } from '../Settings';
+import { IApp, IUI } from '../BasicInterfaces';
 
 /**
  * UI for HTML mode
@@ -10,16 +11,20 @@ export class HTMLUI extends UI {
 
     constructor(
         inBlock: HTMLElement,
-        app: PageFlip,
-        setting: FlipSetting,
+        app: IApp,
         items: NodeListOf<HTMLElement> | HTMLElement[]
     ) {
-        super(inBlock, app, setting);
+        super(inBlock, app);
 
         // Second wrapper to HTML page
         this.wrapper.insertAdjacentHTML('afterbegin', '<div class="stf__block"></div>');
 
-        this.distElement = inBlock.querySelector('.stf__block');
+        let ele:HTMLElement | null = inBlock.querySelector('.stf__block');
+        if (ele === null) {
+            throw new Error('Element not found');
+        }
+
+        this.distElement = ele; 
 
         this.items = items;
         for (const item of items) {

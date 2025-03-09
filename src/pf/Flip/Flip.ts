@@ -1,58 +1,29 @@
-import { Orientation, Render } from '../Render/Render';
-import { PageFlip } from '../PageFlip';
+import { Orientation } from '../Settings';
 import { Helper } from '../Helper';
-import { PageRect, Point } from '../BasicTypes';
+import { FlipCorner, FlipDirection, FlippingState, type PageRect, type Point } from '../BasicTypes';
 import { FlipCalculation } from './FlipCalculation';
-import { Page, PageDensity } from '../Page/Page';
-
-/**
- * Flipping direction
- */
-export const enum FlipDirection {
-    FORWARD,
-    BACK,
-}
-
-/**
- * Active corner when flipping
- */
-export const enum FlipCorner {
-    TOP = 'top',
-    BOTTOM = 'bottom',
-}
-
-/**
- * State of the book
- */
-export const enum FlippingState {
-    /** The user folding the page */
-    USER_FOLD = 'user_fold',
-
-    /** Mouse over active corners */
-    FOLD_CORNER = 'fold_corner',
-
-    /** During flipping animation */
-    FLIPPING = 'flipping',
-
-    /** Base state */
-    READ = 'read',
-}
+import { PageDensity } from '../BasicTypes';
+import {ClickFlipType} from '../Settings';
+// import { Page } from '../Page/Page';
+// import { Render } from '../Render/Render';
+// import { PageFlip } from '../PageFlip';
+import type { IApp, IPage, IRender } from '../BasicInterfaces';
 
 /**
  * Class representing the flipping process
  */
 export class Flip {
-    private readonly render: Render;
-    private readonly app: PageFlip;
+    private readonly render: IRender;
+    private readonly app: IApp;
 
-    private flippingPage: Page = null;
-    private bottomPage: Page = null;
+    private flippingPage: IPage | null = null;
+    private bottomPage: IPage | null = null;
 
-    private calc: FlipCalculation = null;
+    private calc: FlipCalculation | null = null;
 
     private state: FlippingState = FlippingState.READ;
 
-    constructor(render: Render, app: PageFlip) {
+    constructor(render: IRender, app: IApp) {
         this.render = render;
         this.app = app;
     }
@@ -77,7 +48,23 @@ export class Flip {
      * @param globalPos - Touch Point Coordinates (relative window)
      */
     public flip(globalPos: Point): void {
-        if (this.app.getSettings().disableFlipByClick && !this.isPointOnCorners(globalPos)) return;
+
+        let flipType: ClickFlipType = this.app.getSettings().clickFlipType;
+
+        if (flipType === ClickFlipType.DISABLE_FLIPPING){
+            return;
+        }
+
+        if (flipType === ClickFlipType.ONLY_ON_CORNERS){
+            const on_corner = this.isPointOnCorners(globalPos);
+            if (! on_corner) {
+                return;
+            }
+        }
+
+        // flipType is ONLY_VIA_API or ANYWHERE_ON_PAGE
+        // orginal was disableFlipByClick && !this.isPointOnCorners(globalPos)
+        // means you can flip the page by clicking on the corner
 
         // the flipiing process is already running
         if (this.calc !== null) this.render.finishAnimation();
@@ -92,13 +79,18 @@ export class Flip {
         const topMargins = rect.height / 10;
 
         // Defining animation start points
-        const yStart =
-            this.calc.getCorner() === FlipCorner.BOTTOM ? rect.height - topMargins : topMargins;
+        let yStart = topMargins;
+        let yDest = 0;
 
-        const yDest = this.calc.getCorner() === FlipCorner.BOTTOM ? rect.height : 0;
+        if (this.calc !== null) {
+            yStart = this.calc.getCorner() === FlipCorner.BOTTOM ? rect.height - topMargins : topMargins;
+        }
 
-        // Сalculations for these points
-        this.calc.calc({ x: rect.pageWidth - topMargins, y: yStart });
+        if (this.calc !== null) {
+            yDest = this.calc.getCorner() === FlipCorner.BOTTOM ? rect.height : 0;
+            // Сalculations for these points
+            this.calc.calc({ x: rect.pageWidth - topMargins, y: yStart });
+        }
 
         // Run flipping animation
         this.animateFlippingTo(
@@ -132,6 +124,10 @@ export class Flip {
         try {
             this.flippingPage = this.app.getPageCollection().getFlippingPage(direction);
             this.bottomPage = this.app.getPageCollection().getBottomPage(direction);
+
+            if (this.flippingPage === null) {
+                return false;
+            } 
 
             // In landscape mode, needed to set the density  of the next page to the same as that of the flipped
             if (this.render.getOrientation() === Orientation.LANDSCAPE) {
@@ -176,11 +172,15 @@ export class Flip {
      * @param {Point} pagePos - Touch Point Coordinates (relative active page)
      */
     private do(pagePos: Point): void {
+
         if (this.calc === null) return; // Flipping process not started
+
+        if (this.bottomPage === null || this.flippingPage === null) return;
 
         if (this.calc.calc(pagePos)) {
             // Perform calculations for a specific position
             const progress = this.calc.getFlippingProgress();
+            
 
             this.bottomPage.setArea(this.calc.getBottomClipArea());
             this.bottomPage.setPosition(this.calc.getBottomPagePosition());
@@ -202,8 +202,12 @@ export class Flip {
             this.render.setBottomPage(this.bottomPage);
             this.render.setFlippingPage(this.flippingPage);
 
+            let shadowStart:Point | null = this.calc.getShadowStartPoint();
+            if (shadowStart === null) {
+                return
+            }
             this.render.setShadowData(
-                this.calc.getShadowStartPoint(),
+                shadowStart, 
                 this.calc.getShadowAngle(),
                 progress,
                 this.calc.getDirection()
@@ -281,17 +285,26 @@ export class Flip {
      * @param globalPos
      */
     public showCorner(globalPos: Point): void {
+
         if (!this.checkState(FlippingState.READ, FlippingState.FOLD_CORNER)) return;
 
         const rect = this.getBoundsRect();
         const pageWidth = rect.pageWidth;
 
         if (this.isPointOnCorners(globalPos)) {
-            if (this.calc === null) {
+
+            console.log('showCorner fix in place', this.calc);
+
+            // was === null, 
+            // changing it to !== null, doesnt show corners
+            if (this.calc != null) {
+
                 if (!this.start(globalPos)) return;
 
+                console.log('Flip: errors')
                 this.setState(FlippingState.FOLD_CORNER);
 
+                // calculates intersection points
                 this.calc.calc({ x: pageWidth - 1, y: 1 });
 
                 const fixedCornerSize = 50;
@@ -364,7 +377,7 @@ export class Flip {
     /**
      * Get the current calculations object
      */
-    public getCalculation(): FlipCalculation {
+    public getCalculation(): FlipCalculation | null {
         return this.calc;
     }
 
@@ -430,6 +443,9 @@ export class Flip {
     }
 
     private isPointOnCorners(globalPos: Point): boolean {
+
+        // globalPos:relative to the book
+
         const rect = this.getBoundsRect();
         const pageWidth = rect.pageWidth;
 

@@ -1,18 +1,26 @@
-import { PageCollection } from './Collection/PageCollection';
 import { ImagePageCollection } from './Collection/ImagePageCollection';
 import { HTMLPageCollection } from './Collection/HTMLPageCollection';
-import { PageRect, Point } from './BasicTypes';
-import { Flip, FlipCorner, FlippingState } from './Flip/Flip';
-import { Orientation, Render } from './Render/Render';
+import type { PageRect, Point } from './BasicTypes';
+import { Flip } from './Flip/Flip';
+import { FlipCorner, FlippingState } from './BasicTypes';
+import { Orientation } from './Settings';
 import { CanvasRender } from './Render/CanvasRender';
 import { HTMLUI } from './UI/HTMLUI';
 import { CanvasUI } from './UI/CanvasUI';
 import { Helper } from './Helper';
-import { Page } from './Page/Page';
 import { EventObject } from './Event/EventObject';
 import { HTMLRender } from './Render/HTMLRender';
-import { FlipSetting, Settings } from './Settings';
-import { UI } from './UI/UI';
+import type { FlipSetting} from './Settings';
+import { Settings, ClickFlipType } from './Settings';
+
+// import { PageCollection } from './Collection/PageCollection';
+// import { UI } from './UI/UI';
+// import { Page } from './Page/Page';
+//import { Render } from './Render/Render';
+
+import type {IPageCollection, IUI, IApp, IPage, IRender} from './BasicInterfaces';
+import { NoOpRender, NoOpUI, NoOpPageCollection } from './BasicInterfaces';
+import { zeroPoint } from './BasicInterfaces';
 
 import './Style/stPageFlip.css';
 
@@ -21,19 +29,20 @@ import './Style/stPageFlip.css';
  *
  * @extends EventObject
  */
-export class PageFlip extends EventObject {
-    private mousePosition: Point;
+export class PageFlip extends EventObject implements IApp {
+
+    private mousePosition: Point = zeroPoint;
     private isUserTouch = false;
     private isUserMove = false;
 
-    private readonly setting: FlipSetting = null;
+    private setting: FlipSetting;
     private readonly block: HTMLElement; // Root HTML Element
 
-    private pages: PageCollection = null;
-    private flipController: Flip;
-    private render: Render;
+    private pages: IPageCollection  = new NoOpPageCollection();
+    private flipController: Flip | null  = null;
+    private render: IRender = new NoOpRender();
 
-    private ui: UI;
+    private ui: IUI = new NoOpUI();
 
     /**
      * Create a new PageFlip instance
@@ -49,6 +58,12 @@ export class PageFlip extends EventObject {
         this.block = inBlock;
     }
 
+    public setSettings(settings:FlipSetting) {
+        this.ui.removeHandlers()
+        this.setting = settings
+        this.ui.setHandlers()
+    }
+
     /**
      * Destructor. Remove a root HTML element and all event handlers
      */
@@ -62,7 +77,9 @@ export class PageFlip extends EventObject {
      */
     public update(): void {
         this.render.update();
-        this.pages.show();
+        if (this.pages){
+            this.pages.show(null);
+        }
     }
 
     /**
@@ -71,10 +88,10 @@ export class PageFlip extends EventObject {
      * @param {string[]} imagesHref - List of paths to images
      */
     public loadFromImages(imagesHref: string[]): void {
-        this.ui = new CanvasUI(this.block, this, this.setting);
+        this.ui = new CanvasUI(this.block, this);
 
         const canvas = (this.ui as CanvasUI).getCanvas();
-        this.render = new CanvasRender(this, this.setting, canvas);
+        this.render = new CanvasRender(this, canvas);
 
         this.flipController = new Flip(this.render, this);
 
@@ -83,14 +100,14 @@ export class PageFlip extends EventObject {
 
         this.render.start();
 
-        this.pages.show(this.setting.startPage);
+        this.pages.show(this.getSettings().startPage);
 
         // safari fix
         setTimeout(() => {
             this.ui.update();
             this.trigger('init', this, {
-                page: this.setting.startPage,
-                mode: this.render.getOrientation(),
+                page: this.getSettings().startPage,
+                mode: this.render?.getOrientation(),
             });
         }, 1);
     }
@@ -101,25 +118,29 @@ export class PageFlip extends EventObject {
      * @param {(NodeListOf<HTMLElement>|HTMLElement[])} items - List of pages as HTML Element
      */
     public loadFromHTML(items: NodeListOf<HTMLElement> | HTMLElement[]): void {
-        this.ui = new HTMLUI(this.block, this, this.setting, items);
+        this.ui = new HTMLUI(this.block, this, items);
+        let distElement = this.ui.getDistElement();
+        if (distElement === null) {
+            throw new Error('Element not found');
+        }
 
-        this.render = new HTMLRender(this, this.setting, this.ui.getDistElement());
+        this.render = new HTMLRender(this, distElement);
 
         this.flipController = new Flip(this.render, this);
 
-        this.pages = new HTMLPageCollection(this, this.render, this.ui.getDistElement(), items);
+        this.pages = new HTMLPageCollection(this, this.render, distElement, items);
         this.pages.load();
 
         this.render.start();
 
-        this.pages.show(this.setting.startPage);
+        this.pages.show(this.getSettings().startPage);
 
         // safari fix
         setTimeout(() => {
             this.ui.update();
             this.trigger('init', this, {
-                page: this.setting.startPage,
-                mode: this.render.getOrientation(),
+                page: this.getSettings().startPage,
+                mode: this.render?.getOrientation(),
             });
         }, 1);
     }
@@ -130,6 +151,13 @@ export class PageFlip extends EventObject {
      * @param {string[]} imagesHref - List of paths to images
      */
     public updateFromImages(imagesHref: string[]): void {
+
+        if (!this.pages || 
+            this.pages.getCurrentPageIndex() === -1 ||
+            this.render === null)
+        {
+            return
+        }
         const current = this.pages.getCurrentPageIndex();
 
         this.pages.destroy();
@@ -149,10 +177,21 @@ export class PageFlip extends EventObject {
      * @param {(NodeListOf<HTMLElement>|HTMLElement[])} items - List of pages as HTML Element
      */
     public updateFromHtml(items: NodeListOf<HTMLElement> | HTMLElement[]): void {
+
+        let distElement = this.ui.getDistElement();
+        if (!this.pages || 
+            this.pages.getCurrentPageIndex() === -1 ||
+            this.render === null || 
+            distElement === null)
+        {
+            console.error('Error updateFromHtml')
+            return
+        }
+
         const current = this.pages.getCurrentPageIndex();
 
         this.pages.destroy();
-        this.pages = new HTMLPageCollection(this, this.render, this.ui.getDistElement(), items);
+        this.pages = new HTMLPageCollection(this, this.render, distElement, items);
         this.pages.load();
         (this.ui as HTMLUI).updateItems(items);
         this.render.reload();
@@ -168,6 +207,7 @@ export class PageFlip extends EventObject {
      * Clear pages from HTML (remove to initinalState)
      */
     public clear(): void {
+        if (!this.pages) return;
         this.pages.destroy();
         (this.ui as HTMLUI).clear();
     }
@@ -176,6 +216,7 @@ export class PageFlip extends EventObject {
      * Turn to the previous page (without animation)
      */
     public turnToPrevPage(): void {
+        if (! this.pages) return;
         this.pages.showPrev();
     }
 
@@ -183,6 +224,7 @@ export class PageFlip extends EventObject {
      * Turn to the next page (without animation)
      */
     public turnToNextPage(): void {
+        if (! this.pages) return;
         this.pages.showNext();
     }
 
@@ -192,6 +234,7 @@ export class PageFlip extends EventObject {
      * @param {number} page - New page number
      */
     public turnToPage(page: number): void {
+        if (! this.pages) return;
         this.pages.show(page);
     }
 
@@ -201,6 +244,7 @@ export class PageFlip extends EventObject {
      * @param {FlipCorner} corner - Active page corner when turning
      */
     public flipNext(corner: FlipCorner = FlipCorner.TOP): void {
+        if (! this.flipController) return;
         this.flipController.flipNext(corner);
     }
 
@@ -210,6 +254,7 @@ export class PageFlip extends EventObject {
      * @param {FlipCorner} corner - Active page corner when turning
      */
     public flipPrev(corner: FlipCorner = FlipCorner.TOP): void {
+        if (! this.flipController) return;
         this.flipController.flipPrev(corner);
     }
 
@@ -220,6 +265,7 @@ export class PageFlip extends EventObject {
      * @param {FlipCorner} corner - Active page corner when turning
      */
     public flip(page: number, corner: FlipCorner = FlipCorner.TOP): void {
+        if (! this.flipController) return;
         this.flipController.flipToPage(page, corner);
     }
 
@@ -258,6 +304,7 @@ export class PageFlip extends EventObject {
      * @returns {number}
      */
     public getPageCount(): number {
+        if (!this.pages) return 0;
         return this.pages.getPageCount();
     }
 
@@ -267,6 +314,7 @@ export class PageFlip extends EventObject {
      * @returns {number}
      */
     public getCurrentPageIndex(): number {
+        if (!this.pages) return 0;
         return this.pages.getCurrentPageIndex();
     }
 
@@ -276,7 +324,8 @@ export class PageFlip extends EventObject {
      * @param {number} pageIndex
      * @returns {Page}
      */
-    public getPage(pageIndex: number): Page {
+    public getPage(pageIndex: number): IPage | null {
+        if (!this.pages) return null;
         return this.pages.getPage(pageIndex);
     }
 
@@ -285,7 +334,7 @@ export class PageFlip extends EventObject {
      *
      * @returns {Render}
      */
-    public getRender(): Render {
+    public getRender(): IRender {
         return this.render;
     }
 
@@ -294,7 +343,7 @@ export class PageFlip extends EventObject {
      *
      * @returns {Flip}
      */
-    public getFlipController(): Flip {
+    public getFlipController(): Flip | null {
         return this.flipController;
     }
 
@@ -330,7 +379,7 @@ export class PageFlip extends EventObject {
      *
      * @returns {UI}
      */
-    public getUI(): UI {
+    public getUI(): IUI {
         return this.ui;
     }
 
@@ -340,6 +389,7 @@ export class PageFlip extends EventObject {
      * @returns {FlippingState}
      */
     public getState(): FlippingState {
+        if (!this.flipController) return FlippingState.READ
         return this.flipController.getState();
     }
 
@@ -348,7 +398,7 @@ export class PageFlip extends EventObject {
      *
      * @returns {PageCollection}
      */
-    public getPageCollection(): PageCollection {
+    public getPageCollection(): IPageCollection {
         return this.pages;
     }
 
@@ -370,7 +420,15 @@ export class PageFlip extends EventObject {
      * @param {boolean} isTouch - True if there was a touch event, not a mouse click
      */
     public userMove(pos: Point, isTouch: boolean): void {
-        if (!this.isUserTouch && !isTouch && this.setting.showPageCorners) {
+
+        if (! this.flipController) return;
+
+        // let margin = 10
+        // let w = this.getSettings().width + margin;
+        // let h = this.getSettings().height + margin;
+        // if (pos.x < -margin || pos.x > w || pos.y < -margin || pos.y > h) return;
+        
+        if (!this.isUserTouch && !isTouch && this.getSettings().showPageCorners) {
             this.flipController.showCorner(pos); // fold Page Corner
         } else if (this.isUserTouch) {
             if (Helper.GetDistanceBetweenTwoPoint(this.mousePosition, pos) > 5) {
@@ -387,6 +445,9 @@ export class PageFlip extends EventObject {
      * @param {boolean} isSwipe - true if there was a mobile swipe event
      */
     public userStop(pos: Point, isSwipe = false): void {
+
+        if (! this.flipController) return;
+
         if (this.isUserTouch) {
             this.isUserTouch = false;
 

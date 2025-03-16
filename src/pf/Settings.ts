@@ -9,10 +9,12 @@ export enum ClickFlipType {
     // auto set useMouseEvents = true
     ANYWHERE_ON_PAGE = 1,
     ONLY_ON_CORNERS = 2,
+    // ONLY_ON_LEFT_CORNER = 3,
+    // ONLY_ON_RIGHT_CORNER = 4,
 
     // auto set to useMouseEvents = false
-    DISABLE_FLIPPING = 3,
-    ONLY_VIA_API = 4,
+    DISABLE_FLIPPING = 5,
+    ONLY_VIA_API = 6,
 }
 
 /**

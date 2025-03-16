@@ -18,7 +18,8 @@
     "./PageFlip": {
       "import": "./dist/pf/PageFlip.js",
       "types": "./dist/pf/PageFlip.d.ts"
-    }
+    },
+    "./pfstyle.css": "./dist/pf/Style/stPageFlip.css"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.3",

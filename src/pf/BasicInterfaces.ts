@@ -103,9 +103,11 @@ export interface IApp {
     turnToPrevPage(): void;
     turnToNextPage(): void;
     turnToPage(page: number): void;
+
     flipPrev(corner:FlipCorner): void;
     flipNext(corner:FlipCorner): void;
-    flip(page: number, corner: FlipCorner): void;
+    flipToPage(page: number, corner: FlipCorner): void;
+
     updateOrientation: (orientation: Orientation) => void;
     updateState(newState: FlippingState): void;
     updatePageIndex(newPage: number): void;

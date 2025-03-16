@@ -107,7 +107,7 @@ export class PageFlip extends EventObject implements IApp {
             this.ui.update();
             this.trigger('init', this, {
                 page: this.getSettings().startPage,
-                mode: this.render?.getOrientation(),
+                mode: this.render.getOrientation(),
             });
         }, 1);
     }
@@ -140,7 +140,7 @@ export class PageFlip extends EventObject implements IApp {
             this.ui.update();
             this.trigger('init', this, {
                 page: this.getSettings().startPage,
-                mode: this.render?.getOrientation(),
+                mode: this.render.getOrientation(),
             });
         }, 1);
     }
@@ -264,7 +264,7 @@ export class PageFlip extends EventObject implements IApp {
      * @param {number} page - New page number
      * @param {FlipCorner} corner - Active page corner when turning
      */
-    public flip(page: number, corner: FlipCorner = FlipCorner.TOP): void {
+    public flipToPage(page: number, corner: FlipCorner = FlipCorner.TOP): void {
         if (! this.flipController) return;
         this.flipController.flipToPage(page, corner);
     }
@@ -452,8 +452,13 @@ export class PageFlip extends EventObject implements IApp {
             this.isUserTouch = false;
 
             if (!isSwipe) {
-                if (!this.isUserMove) this.flipController.flip(pos);
-                else this.flipController.stopMove();
+                if (!this.isUserMove) {
+                    console.log('user stop flip')
+                    this.flipController.flip(pos);
+                } 
+                else {
+                    this.flipController.stopMove();
+                }
             }
         }
     }

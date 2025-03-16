@@ -34,6 +34,29 @@ export class Flip {
      * @param globalPos - Touch Point Coordinates (relative window)
      */
     public fold(globalPos: Point): void {
+
+        let page_number = this.app.getCurrentPageIndex();
+        let allow_fold = true;
+
+        let flipType: ClickFlipType = this.app.getSettings().clickFlipType;
+        const is_corner = this.isPointOnCorners(globalPos);
+
+        console.log('fold', page_number, is_corner, flipType);
+        let on_left = this.isPointOnLeftCorner(globalPos);
+        console.log('on_left', on_left);
+        let on_right = this.isPointOnRightCorner(globalPos);
+        console.log('on_right', on_right);
+
+        // if (flipType === ClickFlipType.ONLY_ON_LEFT_CORNER){
+        //     allow_fold = on_left;
+        // }
+        // else if (flipType === ClickFlipType.ONLY_ON_RIGHT_CORNER){
+        //     allow_fold = on_right;
+        // }
+
+        if (!allow_fold) return;
+
+
         this.setState(FlippingState.USER_FOLD);
 
         // If the process has not started yet
@@ -50,17 +73,19 @@ export class Flip {
     public flip(globalPos: Point): void {
 
         let flipType: ClickFlipType = this.app.getSettings().clickFlipType;
+        let allow_flip:boolean = true;
+
+        let page_number = this.app.getCurrentPageIndex();
+        // console.log('flip request', page_number);
 
         if (flipType === ClickFlipType.DISABLE_FLIPPING){
-            return;
+            allow_flip = false;
+        }
+        if (flipType === ClickFlipType.ONLY_ON_CORNERS){
+            allow_flip = this.isPointOnCorners(globalPos);
         }
 
-        if (flipType === ClickFlipType.ONLY_ON_CORNERS){
-            const on_corner = this.isPointOnCorners(globalPos);
-            if (! on_corner) {
-                return;
-            }
-        }
+        if (!allow_flip) return;
 
         // flipType is ONLY_VIA_API or ANYWHERE_ON_PAGE
         // orginal was disableFlipByClick && !this.isPointOnCorners(globalPos)
@@ -293,24 +318,23 @@ export class Flip {
 
         if (this.isPointOnCorners(globalPos)) {
 
-            console.log('showCorner fix in place', this.calc);
+            if (this.calc === null) {
 
-            // was === null, 
-            // changing it to !== null, doesnt show corners
-            if (this.calc != null) {
-
+                // this.start() builds the this.calc object
                 if (!this.start(globalPos)) return;
 
-                console.log('Flip: errors')
                 this.setState(FlippingState.FOLD_CORNER);
 
                 // calculates intersection points
+                // @ts-ignore
                 this.calc.calc({ x: pageWidth - 1, y: 1 });
 
                 const fixedCornerSize = 50;
+                // @ts-ignore
                 const yStart = this.calc.getCorner() === FlipCorner.BOTTOM ? rect.height - 1 : 1;
 
                 const yDest =
+                    // @ts-ignore
                     this.calc.getCorner() === FlipCorner.BOTTOM
                         ? rect.height - fixedCornerSize
                         : fixedCornerSize;
@@ -449,7 +473,10 @@ export class Flip {
         const rect = this.getBoundsRect();
         const pageWidth = rect.pageWidth;
 
-        const operatingDistance = Math.sqrt(Math.pow(pageWidth, 2) + Math.pow(rect.height, 2)) / 5;
+        let operatingDistance = Math.sqrt(Math.pow(pageWidth, 2) + Math.pow(rect.height, 2)) / 5;
+        // added to decrease the operating distance
+        operatingDistance = operatingDistance/2.0;
+        // console.log('op distance', operatingDistance);
 
         const bookPos = this.render.convertToBook(globalPos);
 
@@ -459,6 +486,48 @@ export class Flip {
             bookPos.x < rect.width &&
             bookPos.y < rect.height &&
             (bookPos.x < operatingDistance || bookPos.x > rect.width - operatingDistance) &&
+            (bookPos.y < operatingDistance || bookPos.y > rect.height - operatingDistance)
+        );
+    }
+
+    private isPointOnLeftCorner(globalPos: Point): boolean {
+
+        const rect = this.getBoundsRect();
+        const pageWidth = rect.pageWidth;
+        let operatingDistance = Math.sqrt(Math.pow(pageWidth, 2) + Math.pow(rect.height, 2)) / 5;
+        // operatingDistance = operatingDistance/2.0;
+        const bookPos = this.render.convertToBook(globalPos);
+        /*
+        [  |  ]
+        [  |  ]
+        [* |  ]
+        */
+        return (
+            bookPos.x > 0 &&
+            bookPos.y > 0 &&
+            bookPos.x < rect.width &&
+            bookPos.y < rect.height &&
+            (bookPos.x < operatingDistance) &&
+            (bookPos.y < operatingDistance || bookPos.y > rect.height - operatingDistance)
+        );
+    }
+    private isPointOnRightCorner(globalPos: Point): boolean {
+        const rect = this.getBoundsRect();
+        const pageWidth = rect.pageWidth;
+        let operatingDistance = Math.sqrt(Math.pow(pageWidth, 2) + Math.pow(rect.height, 2)) / 5;
+        // operatingDistance = operatingDistance/2.0;
+        const bookPos = this.render.convertToBook(globalPos);
+        /*
+        [  |  ]
+        [  |  ]
+        [  | *]
+        */
+        return (
+            bookPos.x > 0 &&
+            bookPos.y > 0 &&
+            bookPos.x < rect.width &&
+            bookPos.y < rect.height &&
+            (bookPos.x > rect.width - operatingDistance) &&
             (bookPos.y < operatingDistance || bookPos.y > rect.height - operatingDistance)
         );
     }

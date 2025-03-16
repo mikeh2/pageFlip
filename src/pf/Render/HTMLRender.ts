@@ -57,18 +57,14 @@ export class HTMLRender extends Render {
     public clearShadow(): void {
         super.clearShadow();
 
-        if (this.outerShadow !== null) {
-            this.outerShadow.style.cssText = 'display: none';
-        }
-        if (this.innerShadow !== null) {
-            this.innerShadow.style.cssText = 'display: none';
-        }
-        if (this.hardShadow !== null) {
-            this.hardShadow.style.cssText = 'display: none';
-        }
-        if (this.hardInnerShadow !== null) {
-            this.hardInnerShadow.style.cssText = 'display: none';
-        }
+        // @ts-ignore
+        this.outerShadow.style.cssText = 'display: none';
+        // @ts-ignore
+        this.innerShadow.style.cssText = 'display: none';
+        // @ts-ignore
+        this.hardShadow.style.cssText = 'display: none';
+        // @ts-ignore
+        this.hardInnerShadow.style.cssText = 'display: none';
     }
 
     public reload(): void {
